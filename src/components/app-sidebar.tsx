@@ -15,7 +15,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 
 const menuItems = [
   { href: "/seguros", label: "Seguros", icon: Building, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
+  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin'] },
 ];
 
 export default function AppSidebar() {
@@ -44,8 +44,8 @@ export default function AppSidebar() {
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
-                  width={220}
-                  height={68}
+                  width={180}
+                  height={56}
                   className="object-contain"
                   priority
                 />

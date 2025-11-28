@@ -60,7 +60,7 @@ export default function UsuariosPage() {
 
 
   const usersQuery = useMemoFirebase(() => {
-    if (!firestore || !user || !profile || !['admin', 'supervisor'].includes(profile.rol)) return null;
+    if (!firestore || !user || !profile || profile.rol !== 'admin') return null;
     return collection(firestore, 'users');
   }, [firestore, user, profile]);
 
@@ -106,7 +106,7 @@ export default function UsuariosPage() {
     );
   }
   
-  if (profile && !['admin', 'supervisor'].includes(profile.rol)) {
+  if (profile && profile.rol !== 'admin') {
      return (
       <div className="flex items-center justify-center h-full">
         <p>No tienes permiso para ver esta página.</p>
