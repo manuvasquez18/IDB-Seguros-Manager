@@ -8,18 +8,21 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Solo redirigir cuando la carga del usuario haya terminado
-    if (!isUserLoading) {
-      if (user) {
-        router.push('/seguros');
-      } else {
-        router.push('/login');
-      }
+    // Si ya sabemos que hay un usuario, vamos a la app.
+    if (user) {
+      router.push('/seguros');
+      return;
     }
+    
+    // Si la carga ha terminado y no hay usuario, vamos al login.
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    // Si está cargando y no hay usuario, esta página mostrará "Cargando..."
   }, [user, isUserLoading, router]);
 
-  // Mientras se carga, no hacer nada o mostrar un spinner simple.
-  // Evita la redirección hasta que el estado sea definitivo.
+  // Mientras se carga, mostramos un spinner simple.
+  // Esto solo se verá momentáneamente mientras se determina el estado de autenticación.
   return (
     <div className="flex justify-center items-center h-screen">
       <p>Cargando...</p>

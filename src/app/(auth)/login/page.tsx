@@ -59,7 +59,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
         <CardDescription>
@@ -104,5 +104,3 @@ export default function LoginPage() {
     </Card>
   );
 }
-
-    
