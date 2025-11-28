@@ -23,11 +23,23 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https' ,
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https' ,
+        hostname: 'idbclinicas.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https' ,
+        hostname: 'citasprevimedicaidb.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };

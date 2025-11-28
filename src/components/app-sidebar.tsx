@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Sidebar,
@@ -50,11 +51,14 @@ export default function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Building className="w-8 h-8 text-sidebar-foreground" />
-          <h1 className="text-xl font-bold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-            IDB Seguros
-          </h1>
+        <Link href="/" className="flex items-center gap-2 justify-center group-data-[collapsible=icon]:justify-center">
+          <Image 
+            src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+            alt="IDB Previmédica Logo"
+            width={150}
+            height={40}
+            className="h-10 w-auto group-data-[collapsible=icon]:h-8"
+          />
         </Link>
       </SidebarHeader>
       <SidebarContent>
