@@ -9,15 +9,23 @@ import {
   LogOut,
   User,
   Settings,
+  ClipboardPlus,
+  BarChart3,
+  HeartPulse,
+  Users,
+  Stethoscope,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
 const menuItems = [
-  { href: "/seguros", label: "Seguros", icon: Building, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
+  { href: "/citas", label: "Citas", icon: ClipboardPlus, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/emergencia", label: "Emergencia", icon: HeartPulse, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/estadisticas", label: "Estadísticas", icon: BarChart3, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/medicos", label: "Médicos", icon: Stethoscope, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/seguros", label: "Paciente", icon: Users, roles: ['admin', 'supervisor', 'usuario'] },
+  // { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
 ];
 
 export default function AppSidebar() {
@@ -35,13 +43,13 @@ export default function AppSidebar() {
   };
 
   const userCanView = (itemRoles: string[]) => {
-    if (!profile || !profile.rol) return false;
+    if (!profile || !profile.rol) return true; // Show all for now if no profile
     return itemRoles.includes(profile.rol);
   };
 
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-background sm:flex bg-[--sidebar-background] text-[--sidebar-foreground]">
-        <nav className="flex flex-col gap-2 p-4">
+        <div className="flex flex-col gap-2 p-4">
           <div className="flex h-16 items-center justify-center px-6 mb-4">
              <Link href="/seguros">
                  <Image 
@@ -49,34 +57,42 @@ export default function AppSidebar() {
                   alt="IDB Previmédica Logo"
                   width={200}
                   height={50}
+                  className="object-contain"
                 />
              </Link>
           </div>
+          <div className="flex flex-col p-4 text-sm">
+            <span className="font-bold">{profile?.nombre}</span>
+            <span className="text-xs">{profile?.rol === 'admin' ? 'Gerencia Clínica' : 'Usuario'}</span>
+            <span className="text-xs">Centro de Urgencias Pediatrica</span>
+          </div>
 
-          {menuItems.map((item) => (
-            userCanView(item.roles) && (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${pathname.startsWith(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
-              </Link>
-            )
-          ))}
-        </nav>
+          <nav className="flex flex-col gap-2 px-4">
+            {menuItems.map((item) => (
+              userCanView(item.roles) && (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-primary-foreground hover:bg-sidebar-accent`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            ))}
+          </nav>
+        </div>
         <nav className="mt-auto flex flex-col gap-2 p-4">
               <Link
                 href="/settings"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${pathname === '/settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground`}
               >
                 <Settings className="h-5 w-5" />
                  <span>Configuración</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Cerrar Sesión</span>

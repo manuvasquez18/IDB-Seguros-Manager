@@ -54,8 +54,8 @@ export default function AppHeader() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <CircleUser className="h-6 w-6" />
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>

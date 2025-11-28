@@ -17,8 +17,6 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 
 
 export default function LoginPage() {
@@ -61,53 +59,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 w-full max-w-sm">
-      <Image
-        src="https://idbclinicas.com/wp-content/uploads/2017/09/IDB-clinicas-logo.png"
-        alt="IDB Clínicas Logo"
-        width={200}
-        height={50}
-        className="mb-4"
-      />
-      <Card className="w-full">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-          <CardDescription>
-            Accede a tu panel de control.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Correo Electrónico</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
+    <Card className="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+        <CardDescription>
+          Accede a tu panel de control.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleLogin} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Correo Electrónico</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Contraseña</Label>
+              <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input id="password" name="password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-      <footer className="text-center text-xs text-muted-foreground">
-        <p>© Grupo de Clínicas IDB</p>
-        <p>RIF: J-31045674-7, RIF: J-30372913-4, RIF: J-30988796-3</p>
-      </footer>
-    </div>
+            <Input id="password" name="password" type="password" required />
+          </div>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+          </Button>
+          <Button variant="outline" className="w-full" type="button" disabled>
+            Iniciar sesión con Google
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          ¿No tienes una cuenta?{" "}
+          <Link href="/register" className="underline">
+            Regístrate
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

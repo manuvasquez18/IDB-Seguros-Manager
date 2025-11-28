@@ -4,8 +4,18 @@ import Image from "next/image";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-muted/40 p-4">
-      {children}
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
+      <div className="flex items-center justify-center py-12">{children}</div>
+      <div className="hidden bg-muted lg:block">
+        <Image
+          data-ai-hint="logo"
+          src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+          alt="Image"
+          width="1920"
+          height="1080"
+          className="h-full w-full object-contain"
+        />
+      </div>
     </div>
   );
 }

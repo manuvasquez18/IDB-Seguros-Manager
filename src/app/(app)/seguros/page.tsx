@@ -124,71 +124,55 @@ export default function SegurosPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Gestión de Seguros</h1>
-            <p className="text-muted-foreground">
-              Administra los seguros, pólizas y clientes.
-            </p>
-          </div>
-          {canCreate && (
-            <Button onClick={handleAdd}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Añadir Seguro
-            </Button>
-          )}
-        </div>
-
-        <Card>
+      <Card>
           <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <CardTitle>Seguros Registrados</CardTitle>
-                <CardDescription>
-                  Una lista de todos los seguros en el sistema.
-                </CardDescription>
-              </div>
-              <div className="relative w-full max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
+            <CardTitle>Búsqueda de pacientes dados de alta</CardTitle>
+             <div className="flex items-center gap-4">
+               <Input
                   type="search"
-                  placeholder="Buscar por nombre, contacto, RIF..."
-                  className="w-full appearance-none bg-background pl-8 shadow-none"
+                  placeholder="Buscar por nombre, cédula, nombre del médico"
+                  className="w-full appearance-none bg-background shadow-none"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
+                <Button>
+                  <Search className="mr-2 h-4 w-4" />
+                  Buscar
+                </Button>
             </div>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead className="hidden md:table-cell">Contacto</TableHead>
-                  <TableHead className="hidden lg:table-cell">RIF</TableHead>
-                  <TableHead>Estatus</TableHead>
-                  {(canEdit || canDelete || canViewDetails) && (
-                    <TableHead>
-                      <span className="sr-only">Acciones</span>
-                    </TableHead>
-                  )}
+                <TableRow className="bg-primary hover:bg-primary/90">
+                  <TableHead className="text-primary-foreground">Nº Historia</TableHead>
+                  <TableHead className="text-primary-foreground hidden md:table-cell">Cédula</TableHead>
+                  <TableHead className="text-primary-foreground hidden lg:table-cell">Apellidos y Nombres</TableHead>
+                  <TableHead className="text-primary-foreground">Ubicación</TableHead>
+                  <TableHead className="text-primary-foreground">Pendientes</TableHead>
+                  <TableHead className="text-primary-foreground">Médico tratante</TableHead>
+                  <TableHead className="text-primary-foreground">Fecha de admisión</TableHead>
+                  <TableHead className="text-primary-foreground">
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredSeguros && filteredSeguros.length > 0 ? (
                   filteredSeguros.map((seguro) => (
                     <TableRow key={seguro.id} className="cursor-pointer" onClick={() => handleViewDetails(seguro)}>
-                      <TableCell className="font-medium">{seguro.nombre}</TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
+                      <TableCell className="font-medium">{seguro.id.substring(0,6)}</TableCell>
+                      <TableCell className="hidden md:table-cell">{seguro.rif}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{seguro.nombre}</TableCell>
                       <TableCell>
                          <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
                           {seguro.estatus}
                         </Badge>
                       </TableCell>
-                      {(canEdit || canDelete || canViewDetails) && (
+                      <TableCell>Pendiente</TableCell>
+                      <TableCell>{seguro.contacto}</TableCell>
+                      <TableCell>{seguro.created_at ? new Date(seguro.created_at).toLocaleDateString() : ''}</TableCell>
+                      
                         <TableCell onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -205,12 +189,11 @@ export default function SegurosPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
-                      )}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">
+                    <TableCell colSpan={8} className="text-center h-24">
                       {searchTerm ? 'No se encontraron seguros con ese criterio.' : 'No se encontraron seguros.'}
                     </TableCell>
                   </TableRow>
@@ -219,7 +202,7 @@ export default function SegurosPage() {
             </Table>
           </CardContent>
         </Card>
-      </div>
+      
       {canCreate && (
           <SeguroSheet
             open={sheetOpen}
