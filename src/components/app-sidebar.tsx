@@ -44,9 +44,9 @@ export default function AppSidebar() {
           <div className="flex h-16 items-center justify-center px-6 mb-4">
              <Link href="/seguros">
                  <Image 
-                  src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
-                  alt="IDB Previmédica Logo"
-                  width={200}
+                  src="https://idbclinicas.com/wp-content/uploads/2023/11/logo-white.png"
+                  alt="IDB Clinicas Logo"
+                  width={150}
                   height={50}
                   className="object-contain"
                 />
@@ -59,7 +59,7 @@ export default function AppSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent ${pathname.startsWith(item.href) ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:bg-sidebar-accent/50 ${pathname.startsWith(item.href) ? "bg-sidebar-accent/60" : ""}`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -71,14 +71,14 @@ export default function AppSidebar() {
         <nav className="mt-auto flex flex-col gap-2 p-4">
               <Link
                 href="/settings"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50`}
               >
                 <Settings className="h-5 w-5" />
                  <span>Configuración</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Cerrar Sesión</span>
