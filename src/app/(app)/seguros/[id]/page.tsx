@@ -15,7 +15,7 @@ import { CorreosTab } from '@/components/seguros/details/CorreosTab';
 import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 
-type TabValue = 'info' | 'comunicaciones' | 'usuarios_portal' | 'archivos';
+type TabValue = 'info' | 'colectivos' | 'contactos_correos' | 'usuarios_portal' | 'archivos';
 
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
@@ -80,9 +80,10 @@ export default function SeguroDetailPage() {
       </div>
       
       <Tabs defaultValue="info" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="info">Información General</TabsTrigger>
-          <TabsTrigger value="comunicaciones">Comunicaciones</TabsTrigger>
+          <TabsTrigger value="colectivos">Colectivos</TabsTrigger>
+          <TabsTrigger value="contactos_correos">Contactos y Correos</TabsTrigger>
           <TabsTrigger value="usuarios_portal">Usuarios Portal</TabsTrigger>
           <TabsTrigger value="archivos">Archivos</TabsTrigger>
         </TabsList>
@@ -90,10 +91,12 @@ export default function SeguroDetailPage() {
         <TabsContent value="info">
             <SeguroInfoTab seguro={seguro} isActive={activeTab === 'info'} />
         </TabsContent>
-        <TabsContent value="comunicaciones" className="space-y-6">
-          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
-          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
-          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
+        <TabsContent value="colectivos">
+          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'colectivos'} />
+        </TabsContent>
+        <TabsContent value="contactos_correos" className="space-y-6">
+          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'contactos_correos'} />
+          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'contactos_correos'} />
         </TabsContent>
         <TabsContent value="usuarios_portal">
            <UsuariosPortalTab seguroId={seguro.id} isActive={activeTab === 'usuarios_portal'} />
