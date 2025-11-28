@@ -21,12 +21,10 @@ export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
       if (currentUser) {
         router.push("/seguros");
       }
@@ -37,7 +35,7 @@ export default function LoginPage() {
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || !auth) return;
 
     setIsSubmitting(true);
     const email = (event.currentTarget.elements.namedItem("email") as HTMLInputElement).value;

@@ -12,71 +12,48 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth, initiateEmailSignUp, useFirestore } from "@/firebase";
+import { useAuth, initiateEmailSignUp } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-import { doc } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function RegisterPage() {
   const auth = useAuth();
-  const firestore = useFirestore();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // This state will hold the details from the form to be used by the auth state listener
-  const [pendingUserDetails, setPendingUserDetails] = useState<{ email: string; firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
-    if (!auth || !firestore || !pendingUserDetails) return;
+    if (!auth) return;
 
-    // This effect runs when a user is successfully created by Firebase Auth
+    // This listener will simply redirect the user once they are logged in.
+    // The user profile creation is now handled by a server-side Cloud Function.
     const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-      // Check if there's a new user and if their email matches the one from the form
-      if (user && user.email === pendingUserDetails.email) {
-        
-        // Create the user profile document in Firestore
-        const userRef = doc(firestore, `users/${user.uid}`);
-        setDocumentNonBlocking(userRef, {
-            id: user.uid,
-            nombre: `${pendingUserDetails.firstName} ${pendingUserDetails.lastName}`.trim(),
-            email: user.email,
-            rol: 'supervisor', // Default role
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        }, { merge: true }); // Use merge to be safe
-        
-        // Clear the pending details to prevent this from running again
-        setPendingUserDetails(null);
-        
-        // Redirect to the main app page
+      if (user) {
+        // User is signed in, redirect to the main app.
         router.push("/seguros");
       }
     });
 
-    return () => unsubscribe(); // Cleanup subscription on component unmount
-  }, [auth, firestore, router, pendingUserDetails]);
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
+  }, [auth, router]);
 
 
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || !auth) return;
+
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const firstName = formData.get("first-name") as string;
-    const lastName = formData.get("last-name") as string;
-
-    // Store form details to be used by the useEffect listener
-    setPendingUserDetails({ email, firstName, lastName });
     
-    // Initiate the non-blocking sign-up process.
-    // The useEffect above will handle profile creation and redirection.
+    // Initiate the sign-up process.
+    // The onAuthStateChanged listener will handle redirection upon success.
     initiateEmailSignUp(auth, email, password);
+
+    // No need to manually set isSubmitting to false, as the redirect will unmount the component.
   };
 
   return (
@@ -130,4 +107,3 @@ export default function RegisterPage() {
     </Card>
   );
 }
-
