@@ -8,7 +8,6 @@ import {
   Building,
   LogOut,
   User,
-  Settings,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -69,13 +68,6 @@ export default function AppSidebar() {
           </nav>
         </div>
         <nav className="mt-auto flex flex-col gap-2 p-4">
-              <Link
-                href="/settings"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent`}
-              >
-                <Settings className="h-5 w-5" />
-                 <span>Configuración</span>
-              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground hover:bg-sidebar-accent"
