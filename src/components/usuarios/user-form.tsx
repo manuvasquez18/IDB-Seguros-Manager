@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -20,25 +21,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { UserProfile } from "@/lib/definitions";
+
 
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio."),
   email: z.string().email("Debe ser un correo electrónico válido."),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres."),
+  // Make password optional, but if provided, must be at least 6 chars
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres.").optional().or(z.literal('')),
   rol: z.enum(["admin", "supervisor", "usuario"]),
 });
+
+// For edit mode, we don't require a password
+const editSchema = formSchema.omit({ password: true, email: true });
+
 
 export type UserFormValues = z.infer<typeof formSchema>;
 
 interface UserFormProps {
   onSubmit: (data: UserFormValues) => void;
   isSubmitting: boolean;
+  defaultValues?: UserProfile | null;
+  isEditMode: boolean;
 }
 
-export function UserForm({ onSubmit, isSubmitting }: UserFormProps) {
+export function UserForm({ onSubmit, isSubmitting, defaultValues, isEditMode }: UserFormProps) {
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
+    resolver: zodResolver(isEditMode ? editSchema : formSchema),
+    defaultValues: defaultValues || {
       nombre: '',
       email: '',
       password: '',
@@ -69,25 +79,27 @@ export function UserForm({ onSubmit, isSubmitting }: UserFormProps) {
             <FormItem>
               <FormLabel>Correo Electrónico</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="m@example.com" {...field} />
+                <Input type="email" placeholder="m@example.com" {...field} disabled={isEditMode} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contraseña</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!isEditMode && (
+             <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Contraseña</FormLabel>
+                    <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+            />
+        )}
         <FormField
           control={form.control}
           name="rol"
@@ -112,7 +124,10 @@ export function UserForm({ onSubmit, isSubmitting }: UserFormProps) {
         />
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Creando...' : 'Crear Usuario'}
+            {isSubmitting 
+                ? (isEditMode ? 'Guardando...' : 'Creando...')
+                : (isEditMode ? 'Guardar Cambios' : 'Crear Usuario')
+            }
           </Button>
         </div>
       </form>

@@ -2,9 +2,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useCollection, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
-import { collection, doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/definitions';
 import {
   Card,
@@ -23,20 +22,23 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Edit, PlusCircle, Trash2, UserCheck, UserX } from 'lucide-react';
+import { Edit, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { useToast } from '@/hooks/use-toast';
 import { UserSheet } from '@/components/usuarios/user-sheet';
+import { deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 
 function getInitials(name: string) {
@@ -53,10 +55,12 @@ export default function UsuariosPage() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const { profile } = useUserProfile();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { toast } = useToast();
-  const auth = useAuth();
+  const [selectedUser, setSelectedUser] = useState<UserProfile | undefined>(undefined);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
 
 
   const usersQuery = useMemoFirebase(() => {
@@ -71,7 +75,6 @@ export default function UsuariosPage() {
   const canCreate = profile?.rol === 'admin';
   const canEdit = profile?.rol === 'admin';
   const canDelete = profile?.rol === 'admin';
-  const canToggleActive = profile?.rol === 'admin';
 
 
   const getRoleVariant = (role: string) => {
@@ -99,8 +102,31 @@ export default function UsuariosPage() {
   
   const handleAddUser = () => {
     if (!canCreate) return;
+    setSelectedUser(undefined);
     setSheetOpen(true);
   }
+
+  const handleEditUser = (user: UserProfile) => {
+    if (!canEdit) return;
+    setSelectedUser(user);
+    setSheetOpen(true);
+  }
+
+  const openDeleteDialog = (user: UserProfile) => {
+    if (!canDelete) return;
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (!firestore || !userToDelete || !canDelete) return;
+    const docRef = doc(firestore, 'users', userToDelete.id);
+    // Note: This only deletes the Firestore document, not the Firebase Auth user.
+    // Additional logic with Firebase Admin SDK (on a backend) is needed for full deletion.
+    deleteDocumentNonBlocking(docRef);
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
 
   if (isLoading) {
     return (
@@ -192,13 +218,8 @@ export default function UsuariosPage() {
                         {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : 'N/A'}
                       </TableCell>
                       <TableCell className="text-right space-x-2">
-                        {canEdit && <Button variant="outline" size="icon"><Edit className="h-4 w-4" /></Button>}
-                        {canToggleActive && (
-                            <Button variant="outline" size="icon">
-                                {user.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
-                            </Button>
-                        )}
-                        {canDelete && <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>}
+                        {canEdit && <Button variant="outline" size="icon" onClick={() => handleEditUser(user)}><Edit className="h-4 w-4" /></Button>}
+                        {canDelete && <Button variant="destructive" size="icon" onClick={() => openDeleteDialog(user)}><Trash2 className="h-4 w-4" /></Button>}
                       </TableCell>
                     </TableRow>
                   ))
@@ -213,12 +234,25 @@ export default function UsuariosPage() {
             </Table>
           </CardContent>
         </Card>
-      {canCreate && (
         <UserSheet
             open={sheetOpen}
             onOpenChange={setSheetOpen}
+            user={selectedUser}
         />
-      )}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    Esta acción no se puede deshacer. Esto eliminará permanentemente el perfil del usuario de Firestore, pero **no** eliminará al usuario de Firebase Authentication.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </>
   );
 }
