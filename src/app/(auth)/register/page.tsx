@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -35,9 +36,9 @@ export default function RegisterPage() {
   };
   
   useEffect(() => {
+    if (!auth || !firestore) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && isSubmitting) {
-        if (!firestore) return;
         // Create user profile document in Firestore
         const userRef = doc(firestore, `users/${user.uid}`);
         setDocumentNonBlocking(userRef, {
