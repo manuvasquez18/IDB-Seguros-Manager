@@ -59,39 +59,46 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="mx-auto max-w-sm w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-        <CardDescription>
-          Ingresa tu correo electrónico para acceder a tu cuenta
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleLogin} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Correo Electrónico</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Contraseña</Label>
-              <Link href="#" className="ml-auto inline-block text-sm underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
+    <div className="flex flex-col items-center justify-center gap-6">
+      <Card className="mx-auto max-w-sm w-full">
+        <CardHeader>
+          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+          <CardDescription>
+            Ingresa tu correo electrónico para acceder a tu cuenta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Correo Electrónico</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+              />
             </div>
-            <Input id="password" name="password" type="password" required />
-          </div>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Contraseña</Label>
+                <Link href="#" className="ml-auto inline-block text-sm underline">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+              <Input id="password" name="password" type="password" required />
+            </div>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <footer className="text-center text-xs text-muted-foreground">
+        <p>© Grupo de Clínicas IDB</p>
+        <p>RIF: J-31045674-7, RIF: J-30372913-4, RIF: J-30988796-3</p>
+      </footer>
+    </div>
   );
 }
+
