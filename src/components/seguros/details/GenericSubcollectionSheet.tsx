@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -48,10 +49,31 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
   const firestore = useFirestore();
   const isEditMode = !!selectedItem;
 
+  const defaultValues = React.useMemo(() => {
+    const initialValues: Record<string, any> = {};
+    formFields.forEach(field => {
+        if(field.type === 'switch') {
+            initialValues[field.name as string] = false;
+        } else {
+            initialValues[field.name as string] = '';
+        }
+    });
+    return {
+        ...initialValues,
+        ...(selectedItem || {}),
+    } as z.infer<T>;
+  }, [selectedItem, formFields]);
+
+
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(formSchema),
-    defaultValues: selectedItem || {},
+    defaultValues: defaultValues,
   });
+
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [defaultValues, form]);
+
 
   const handleSubmit = (data: z.infer<T>) => {
     if (!firestore) return;
@@ -77,7 +99,7 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
   
   const handleOpenChange = (isOpen: boolean) => {
     if(!isOpen) {
-        form.reset();
+        form.reset(defaultValues);
     }
     onOpenChange(isOpen);
   }
@@ -110,7 +132,7 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
                             onCheckedChange={field.onChange}
                         />
                       ) : (
-                        <Input type={fieldConfig.type} placeholder={fieldConfig.placeholder} {...field} />
+                        <Input type={fieldConfig.type} placeholder={fieldConfig.placeholder} {...field} value={field.value ?? ''} />
                       )}
                     </FormControl>
                     <FormMessage />
