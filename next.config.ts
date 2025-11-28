@@ -25,10 +25,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https' ,
-        hostname: 'citas.previmedicaidb.com',
-      },
-      {
-        protocol: 'https' ,
         hostname: 'citasprevimedicaidb.com',
       },
       {
