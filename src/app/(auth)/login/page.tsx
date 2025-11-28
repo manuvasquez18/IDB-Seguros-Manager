@@ -29,10 +29,7 @@ export default function LoginPage() {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        // Redirection is handled after successful login action
-      } else {
-        // User is signed out, clear submission state
-        setIsSubmitting(false);
+        router.push("/seguros");
       }
     });
     return () => unsubscribe();
@@ -49,8 +46,7 @@ export default function LoginPage() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Let onAuthStateChanged handle the final redirect if needed, but we can push directly
-      router.push("/seguros");
+      // The onAuthStateChanged listener will handle the redirect.
     } catch (error: any) {
       console.error("Login Error:", error);
        toast({

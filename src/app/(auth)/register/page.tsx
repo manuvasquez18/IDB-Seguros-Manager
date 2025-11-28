@@ -14,8 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { FormEvent, useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,18 +25,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, let's redirect.
-        // The profile creation is handled by the form submission.
-        router.push("/seguros");
-      }
-    });
-    return () => unsubscribe();
-  }, [auth, router]);
 
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,12 +58,10 @@ export default function RegisterPage() {
         updated_at: new Date().toISOString(),
       };
 
-      // The `await` here is crucial. We wait for the profile to be created.
       await setDoc(doc(firestore, "users", user.uid), userProfile);
       
-      // 4. Now that the profile is created, we can safely redirect.
-      // The onAuthStateChanged listener will handle the final redirect.
-      // No need to push here, as the listener will catch the new user state.
+      // 4. Redirect after successful profile creation
+      router.push("/seguros");
 
     } catch (error: any) {
       console.error("Error during registration:", error);
