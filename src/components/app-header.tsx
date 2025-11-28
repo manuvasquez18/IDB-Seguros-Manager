@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { CircleUser } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { NotificationBell } from "./NotificationBell";
 
 export default function AppHeader() {
   const { user } = useUser();
@@ -43,8 +42,6 @@ export default function AppHeader() {
       <div className="w-full flex-1">
         {/* Search bar removed from here */}
       </div>
-
-      <NotificationBell />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
