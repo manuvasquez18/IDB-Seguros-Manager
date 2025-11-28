@@ -49,7 +49,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 export default function SegurosPage() {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -63,7 +63,9 @@ export default function SegurosPage() {
     return collection(firestore, 'seguros');
   }, [firestore, user]);
 
-  const { data: seguros, isLoading } = useCollection<Seguro>(segurosQuery);
+  const { data: seguros, isLoading: isSegurosLoading } = useCollection<Seguro>(segurosQuery);
+  
+  const isLoading = isUserLoading || (user && isSegurosLoading);
 
   const canCreate = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canEdit = profile?.rol === 'admin' || profile?.rol === 'supervisor';
