@@ -22,25 +22,35 @@ import {
   Settings,
   LogOut,
   Building,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
+import { useUserProfile } from "@/hooks/use-user-profile";
+
 
 const menuItems = [
-  { href: "/seguros", label: "Seguros", icon: Shield },
-  { href: "/colectivos", label: "Colectivos", icon: Users },
-  { href: "/contactos", label: "Contactos", icon: BookUser },
-  { href: "/correos", label: "Correos", icon: Mail },
-  { href: "/usuarios", label: "Usuarios de Portal", icon: UserCog },
-  { href: "/popups", label: "Popups", icon: MessageSquare },
-  { href: "/archivos", label: "Archivos", icon: File },
+  { href: "/seguros", label: "Seguros", icon: Shield, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/colectivos", label: "Colectivos", icon: Users, roles: ['admin', 'supervisor'] },
+  { href: "/contactos", label: "Contactos", icon: BookUser, roles: ['admin', 'supervisor'] },
+  { href: "/correos", label: "Correos", icon: Mail, roles: ['admin', 'supervisor'] },
+  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin'] },
+  { href: "/usuarios_portal", label: "Usuarios de Portal", icon: UserCog, roles: ['admin', 'supervisor'] },
+  { href: "/popups", label: "Popups", icon: MessageSquare, roles: ['admin', 'supervisor'] },
+  { href: "/archivos", label: "Archivos", icon: File, roles: ['admin', 'supervisor'] },
 ];
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
+  const { profile } = useUserProfile();
 
   const handleLogout = () => {
     auth.signOut();
+  };
+
+  const userCanView = (itemRoles: string[]) => {
+    if (!profile || !profile.rol) return false;
+    return itemRoles.includes(profile.rol);
   };
 
   return (
@@ -56,18 +66,20 @@ export default function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
-                tooltip={{children: item.label, side: "right"}}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            userCanView(item.roles) && (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+                  tooltip={{children: item.label, side: "right"}}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
           ))}
         </SidebarMenu>
       </SidebarContent>
@@ -82,11 +94,11 @@ export default function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} asChild tooltip={{children: "Cerrar Sesión", side: "right"}}>
-              <Link href="/login">
+            <SidebarMenuButton onClick={handleLogout} tooltip={{children: "Cerrar Sesión", side: "right"}}>
+              <>
                 <LogOut />
                 <span>Cerrar Sesión</span>
-              </Link>
+              </>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

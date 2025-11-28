@@ -41,10 +41,12 @@ import { collection, doc } from "firebase/firestore";
 import type { Seguro } from "@/lib/definitions";
 import { SeguroSheet } from "@/components/seguros/seguro-sheet";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
 
 export default function SegurosPage() {
   const firestore = useFirestore();
+  const { profile } = useUserProfile();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedSeguro, setSelectedSeguro] = useState<Seguro | undefined>(undefined);
@@ -53,31 +55,36 @@ export default function SegurosPage() {
 
   const segurosQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Query the root 'seguros' collection
     return collection(firestore, 'seguros');
   }, [firestore]);
 
   const { data: seguros, isLoading } = useCollection<Seguro>(segurosQuery);
 
+  const canCreate = profile?.rol === 'admin' || profile?.rol === 'supervisor';
+  const canEdit = profile?.rol === 'admin' || profile?.rol === 'supervisor';
+  const canDelete = profile?.rol === 'admin';
+
   const handleAdd = () => {
+    if (!canCreate) return;
     setSelectedSeguro(undefined);
     setSheetOpen(true);
   };
 
   const handleEdit = (seguro: Seguro) => {
+    if (!canEdit) return;
     setSelectedSeguro(seguro);
     setSheetOpen(true);
   };
 
   const openDeleteDialog = (seguro: Seguro) => {
+    if (!canDelete) return;
     setSeguroToDelete(seguro);
     setDeleteDialogOpen(true);
   };
 
   const handleDelete = () => {
-    if (!firestore || !seguroToDelete) return;
-    // Reference the document in the root 'seguros' collection
-    const docRef = doc(firestore, `seguros`, seguroToDelete.id);
+    if (!firestore || !seguroToDelete || !canDelete) return;
+    const docRef = doc(firestore, 'seguros', seguroToDelete.id);
     deleteDocumentNonBlocking(docRef);
     setDeleteDialogOpen(false);
     setSeguroToDelete(null);
@@ -101,10 +108,12 @@ export default function SegurosPage() {
               Administra los seguros, pólizas y clientes.
             </p>
           </div>
-          <Button onClick={handleAdd}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Seguro
-          </Button>
+          {canCreate && (
+            <Button onClick={handleAdd}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Añadir Seguro
+            </Button>
+          )}
         </div>
 
         <Card>
@@ -122,9 +131,11 @@ export default function SegurosPage() {
                   <TableHead className="hidden md:table-cell">Contacto</TableHead>
                   <TableHead className="hidden lg:table-cell">RIF</TableHead>
                   <TableHead>Estatus</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Acciones</span>
-                  </TableHead>
+                  {(canEdit || canDelete) && (
+                    <TableHead>
+                      <span className="sr-only">Acciones</span>
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -139,21 +150,23 @@ export default function SegurosPage() {
                           {seguro.estatus}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                            <DropdownMenuItem onSelect={() => handleEdit(seguro)}>Editar</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => openDeleteDialog(seguro)} className="text-destructive">Eliminar</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      {(canEdit || canDelete) && (
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button aria-haspopup="true" size="icon" variant="ghost">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                              {canEdit && <DropdownMenuItem onSelect={() => handleEdit(seguro)}>Editar</DropdownMenuItem>}
+                              {canDelete && <DropdownMenuItem onSelect={() => openDeleteDialog(seguro)} className="text-destructive">Eliminar</DropdownMenuItem>}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 ) : (
@@ -168,11 +181,13 @@ export default function SegurosPage() {
           </CardContent>
         </Card>
       </div>
-      <SeguroSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        seguro={selectedSeguro}
-      />
+      {canCreate && (
+          <SeguroSheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            seguro={selectedSeguro}
+          />
+      )}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

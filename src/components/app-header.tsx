@@ -17,11 +17,18 @@ import { Button } from "@/components/ui/button";
 import { Bell, CircleUser, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { useUser } from "@/firebase";
+import { useUser, useAuth } from "@/firebase";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
 export default function AppHeader() {
   const { user } = useUser();
+  const auth = useAuth();
+  const { profile } = useUserProfile();
   const avatar = PlaceHolderImages.find(p => p.id === 'user-avatar-1');
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
 
   return (
     <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-30">
@@ -74,15 +81,15 @@ export default function AppHeader() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{user ? user.email : 'Mi Cuenta'}</DropdownMenuLabel>
+          <DropdownMenuLabel>{profile?.nombre || user?.email || 'Mi Cuenta'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Link href="/settings">Configuración</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>Soporte</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Link href="/login">Cerrar Sesión</Link>
+          <DropdownMenuItem onClick={handleLogout}>
+            Cerrar Sesión
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

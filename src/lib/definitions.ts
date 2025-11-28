@@ -4,7 +4,7 @@ export type UserProfile = {
     nombre: string;
     email: string;
     telefono?: string;
-    rol: 'admin' | 'coordinador' | 'usuario';
+    rol: 'admin' | 'supervisor' | 'usuario';
     avatar_url?: string;
     is_active: boolean;
     last_login?: string; // ISO 8601 string
@@ -100,3 +100,10 @@ export type Archivo = {
     created_at?: string;
     updated_at?: string;
 };
+
+// Hook for user profile data
+export interface UserProfileHookResult {
+  profile: UserProfile | null;
+  isLoading: boolean;
+  error: Error | null;
+}

@@ -12,28 +12,34 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth, initiateEmailSignIn } from "@/firebase";
+import { useAuth } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { useToast } from "@/hooks/use-toast";
+
 
 export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        router.push("/seguros");
+        // Redirection is handled after successful login action
+      } else {
+        // User is signed out, clear submission state
+        setIsSubmitting(false);
       }
     });
     return () => unsubscribe();
   }, [auth, router]);
 
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting || !auth) return;
 
@@ -41,8 +47,19 @@ export default function LoginPage() {
     const email = (event.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
     const password = (event.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
     
-    initiateEmailSignIn(auth, email, password);
-    // Let onAuthStateChanged handle the redirect
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // Let onAuthStateChanged handle the final redirect if needed, but we can push directly
+      router.push("/seguros");
+    } catch (error: any) {
+      console.error("Login Error:", error);
+       toast({
+        variant: "destructive",
+        title: "Error al iniciar sesión",
+        description: error.message || "Por favor, comprueba tus credenciales.",
+      });
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -15,20 +15,22 @@ import { Label } from "@/components/ui/label";
 import { useAuth, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, User } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.push("/seguros");
+        // Redirection will be handled after profile creation.
       }
     });
     return () => unsubscribe();
@@ -48,10 +50,11 @@ export default function RegisterPage() {
     const nombre = `${firstName} ${lastName}`;
 
     try {
+      // 1. Create the user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Now that the user is created in Auth, create their profile in Firestore.
+      // 2. Create their profile document in Firestore
       const userProfile = {
         id: user.uid,
         nombre: nombre,
@@ -62,14 +65,20 @@ export default function RegisterPage() {
         updated_at: new Date().toISOString(),
       };
 
+      // The `await` here is crucial. We wait for the profile to be created.
       await setDoc(doc(firestore, "users", user.uid), userProfile);
       
-      // onAuthStateChanged will handle the redirect.
+      // 3. Now that the profile is created, we can safely redirect.
+      router.push("/seguros");
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error during registration:", error);
+      toast({
+        variant: "destructive",
+        title: "Error en el registro",
+        description: error.message || "No se pudo crear la cuenta.",
+      });
       setIsSubmitting(false);
-      // Optionally, show an error message to the user
     }
   };
 
