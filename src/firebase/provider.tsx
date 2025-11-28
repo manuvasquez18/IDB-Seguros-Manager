@@ -74,7 +74,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
-    setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
+    setUserAuthState({ user: auth.currentUser, isUserLoading: true, userError: null }); // Reset on auth instance change
 
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -102,6 +102,16 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       userError: userAuthState.userError,
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
+
+  // CRITICAL FIX: Do not render children until authentication state is resolved.
+  // This prevents all child components from running hooks and making Firestore calls prematurely.
+  if (contextValue.isUserLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <FirebaseContext.Provider value={contextValue}>
