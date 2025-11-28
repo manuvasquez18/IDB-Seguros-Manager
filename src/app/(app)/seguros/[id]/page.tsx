@@ -13,10 +13,9 @@ import { ColectivosTab } from '@/components/seguros/details/ColectivosTab';
 import { ContactosTab } from '@/components/seguros/details/ContactosTab';
 import { CorreosTab } from '@/components/seguros/details/CorreosTab';
 import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTab';
-import { NotificacionesTab } from '@/components/seguros/details/NotificacionesTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 
-type TabValue = 'info' | 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'notificaciones' | 'archivos';
+type TabValue = 'info' | 'comunicaciones' | 'usuarios_portal' | 'archivos';
 
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
@@ -25,7 +24,6 @@ export default function SeguroDetailPage() {
   const [activeTab, setActiveTab] = useState<TabValue>('info');
 
   const seguroRef = useMemoFirebase(() => {
-    // Only run the query if the user is authenticated and firestore is available
     if (!firestore || !seguroId || !user) return null;
     return doc(firestore, 'seguros', seguroId as string);
   }, [firestore, seguroId, user]);
@@ -82,33 +80,23 @@ export default function SeguroDetailPage() {
       </div>
       
       <Tabs defaultValue="info" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="info">Información General</TabsTrigger>
-          <TabsTrigger value="colectivos">Colectivos</TabsTrigger>
-          <TabsTrigger value="contactos">Contactos</TabsTrigger>
-          <TabsTrigger value="correos">Correos</TabsTrigger>
+          <TabsTrigger value="comunicaciones">Comunicaciones</TabsTrigger>
           <TabsTrigger value="usuarios_portal">Usuarios Portal</TabsTrigger>
-          <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
           <TabsTrigger value="archivos">Archivos</TabsTrigger>
         </TabsList>
         
         <TabsContent value="info">
-            <SeguroInfoTab seguro={seguro} />
+            <SeguroInfoTab seguro={seguro} isActive={activeTab === 'info'} />
         </TabsContent>
-        <TabsContent value="colectivos">
-          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'colectivos'} />
-        </TabsContent>
-        <TabsContent value="contactos">
-          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'contactos'} />
-        </TabsContent>
-        <TabsContent value="correos">
-          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'correos'} />
+        <TabsContent value="comunicaciones" className="space-y-6">
+          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
+          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
+          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'comunicaciones'} />
         </TabsContent>
         <TabsContent value="usuarios_portal">
            <UsuariosPortalTab seguroId={seguro.id} isActive={activeTab === 'usuarios_portal'} />
-        </TabsContent>
-        <TabsContent value="notificaciones">
-          <NotificacionesTab seguroId={seguro.id} isActive={activeTab === 'notificaciones'} />
         </TabsContent>
         <TabsContent value="archivos">
           <ArchivosTab seguroId={seguro.id} isActive={activeTab === 'archivos'} />
