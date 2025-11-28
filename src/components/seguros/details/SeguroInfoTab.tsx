@@ -4,10 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { NotificacionesTab } from './NotificacionesTab';
+import { Button } from '@/components/ui/button';
+import { Edit } from 'lucide-react';
 
 interface SeguroInfoTabProps {
   seguro: Seguro;
   isActive: boolean;
+  onEdit?: () => void;
 }
 
 const DetailItem = ({ label, value }: { label: string; value?: string | null }) => {
@@ -35,16 +38,24 @@ const DetailItem = ({ label, value }: { label: string; value?: string | null }) 
 };
 
 
-export function SeguroInfoTab({ seguro, isActive }: SeguroInfoTabProps) {
+export function SeguroInfoTab({ seguro, isActive, onEdit }: SeguroInfoTabProps) {
   return (
     <div className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Columna 1 */}
             <div className="flex flex-col gap-6">
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Información General</CardTitle>
-                        <CardDescription>Detalles principales de la póliza.</CardDescription>
+                    <CardHeader className="flex flex-row items-start justify-between">
+                        <div>
+                            <CardTitle>Información General</CardTitle>
+                            <CardDescription>Detalles principales de la póliza.</CardDescription>
+                        </div>
+                        {onEdit && (
+                            <Button variant="outline" size="sm" onClick={onEdit}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                            </Button>
+                        )}
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div className="grid grid-cols-3 gap-2 text-sm items-center">
