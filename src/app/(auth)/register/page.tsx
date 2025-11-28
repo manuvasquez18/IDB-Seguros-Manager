@@ -37,7 +37,7 @@ export default function RegisterPage() {
     setFormValues({ email, password, firstName, lastName });
     setIsSubmitting(true);
     
-    // Non-blocking call
+    // Non-blocking call to Firebase Auth
     initiateEmailSignUp(auth, email, password);
   };
   
@@ -45,30 +45,31 @@ export default function RegisterPage() {
     if (!auth || !firestore || !isSubmitting) return;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      // We only want to act when the user is created and matches the form submission
       if (user && user.email === formValues.email) {
+        
         // Create user profile document in Firestore
         const userRef = doc(firestore, `users/${user.uid}`);
         setDocumentNonBlocking(userRef, {
             id: user.uid,
             nombre: `${formValues.firstName} ${formValues.lastName}`.trim() || user.email?.split('@')[0],
             email: user.email,
-            rol: 'supervisor', // This role is now a custom claim, but good to have in profile
+            rol: 'supervisor', // Assign supervisor role
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         }, { merge: true });
         
-        // The custom claim is set server-side (e.g., via a Cloud Function on user creation).
-        // For this flow, we assume the claim is set, and we can proceed.
-        // A short delay helps ensure Firestore write is processed before redirect.
+        // The custom claim logic is removed. We rely on the Firestore document now.
+        // A short delay helps ensure the Firestore write has initiated before redirecting.
         setTimeout(() => {
             router.push("/seguros");
-            setIsSubmitting(false); // Reset submission state
+            // No need to reset submission state here, as we are navigating away.
         }, 1000); 
       }
     });
 
-    return () => unsubscribe(); // Cleanup subscription on unmount
+    return () => unsubscribe(); // Cleanup subscription on component unmount
   }, [auth, firestore, router, isSubmitting, formValues]);
 
 

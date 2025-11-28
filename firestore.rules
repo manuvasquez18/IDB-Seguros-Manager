@@ -1,3 +1,4 @@
+
 rules_version = '2';
 
 service cloud.firestore {
@@ -10,47 +11,56 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
-
-    // NEW: Functions to get role from the user's auth token (custom claim)
-    function isAdmin() {
-      return isSignedIn() && request.auth.token.rol == 'admin';
-    }
-
-    function isSupervisor() {
-      return isSignedIn() && request.auth.token.rol == 'supervisor';
-    }
-
-    function isUsuario() {
-        return isSignedIn() && request.auth.token.rol == 'usuario';
-    }
     
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Gets user role from their profile document in Firestore.
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.rol;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole(request.auth.uid) == 'admin';
+    }
+
+    function isSupervisor() {
+      return isSignedIn() && getUserRole(request.auth.uid) == 'supervisor';
+    }
+    
+    function isUsuario() {
+      return isSignedIn() && getUserRole(request.auth.uid) == 'usuario';
     }
 
     // ------------------------------------------------------------------------
     // Collection Rules
     // ------------------------------------------------------------------------
 
-    // User profiles can be read by any signed-in user.
-    // Users can only create their own profile.
-    // Users can update their own profile, or an admin can.
-    // Only admins can delete profiles.
     match /users/{userId} {
       allow read: if isSignedIn();
+      // Users can only create their own profile.
       allow create: if isOwner(userId);
+      // Users can update their own profile, or an admin can.
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
 
-    // Rules for the root 'seguros' collection and its subcollections
     match /seguros/{seguroId} {
+      // Any signed-in user can read insurance policies.
       allow read: if isSignedIn();
+      
+      // Allow creation if the user is an admin or a supervisor.
+      // This is the main rule that was failing.
       allow create: if isAdmin() || isSupervisor();
+
+      // Allow updates if the user is an admin or supervisor.
       allow update: if isAdmin() || isSupervisor();
+      
+      // Only admins can delete.
       allow delete: if isAdmin();
       
-      // Apply same rules to all subcollections of a seguro
+      // Subcollection rules inherit the parent's logic for simplicity
       match /{allSubcollections}/{docId} {
         allow read: if isSignedIn();
         allow create: if isAdmin() || isSupervisor();

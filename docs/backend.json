@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -138,13 +139,7 @@
     }
   },
   "auth": { 
-    "providers": ["password", "anonymous"],
-    "customClaims": {
-      "rol": {
-        "type": "string",
-        "enum": ["admin", "supervisor", "usuario"]
-      }
-    }
+    "providers": ["password", "anonymous"]
   },
   "firestore": {
     "structure": [
