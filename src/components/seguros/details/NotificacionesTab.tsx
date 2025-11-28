@@ -27,8 +27,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 const formFields = [
   { name: 'titulo' as const, label: 'Título de la Notificación', type: 'text' as const, placeholder: 'Ej: Aviso Importante' },
-  { name: 'url' as const, label: 'URL (Opcional)', type: 'text' as const, placeholder: 'https://ejemplo.com/info' },
   { name: 'cuerpo' as const, label: 'Cuerpo del Mensaje', type: 'textarea' as const, placeholder: 'Detalles del aviso...' },
+  { name: 'url' as const, label: 'URL (Opcional)', type: 'text' as const, placeholder: 'https://ejemplo.com/info' },
 ];
 
 export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps) {
