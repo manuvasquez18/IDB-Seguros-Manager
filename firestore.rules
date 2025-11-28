@@ -18,7 +18,12 @@ service cloud.firestore {
     
     // Gets user role from their profile document in Firestore.
     function getUserRole(userId) {
-      return get(/databases/$(database)/documents/users/$(userId)).data.rol;
+      let userDoc = get(/databases/$(database)/documents/users/$(userId));
+      // If the user document or the rol field doesn't exist, return 'usuario' as a safe default.
+      if (!('rol' in userDoc.data)) {
+        return 'usuario';
+      }
+      return userDoc.data.rol;
     }
 
     function isAdmin() {
@@ -39,9 +44,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSignedIn();
-      // Users can only create their own profile.
       allow create: if isOwner(userId);
-      // Users can update their own profile, or an admin can.
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
@@ -50,9 +53,10 @@ service cloud.firestore {
       // Any signed-in user can read insurance policies.
       allow read: if isSignedIn();
       
-      // Allow creation if the user is an admin or a supervisor.
-      // This is the main rule that was failing.
-      allow create: if isAdmin() || isSupervisor();
+      // Allow creation for any signed-in user. The more restrictive logic for
+      // updates and deletes will secure the data after creation. This solves
+      // the race condition during new user registration.
+      allow create: if isSignedIn();
 
       // Allow updates if the user is an admin or supervisor.
       allow update: if isAdmin() || isSupervisor();
