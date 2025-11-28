@@ -4,10 +4,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,24 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CircleUser } from "lucide-react";
+import { CircleUser, PanelLeft } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useIsMobile } from "@/hooks/use-mobile";
-
-function HeaderSidebarTrigger() {
-    const isMobile = useIsMobile();
-
-    if (!isMobile) {
-        return null;
-    }
-
-    return (
-        <div className="md:hidden">
-            <SidebarTrigger />
-        </div>
-    );
-}
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import AppSidebar from "@/components/app-sidebar";
 
 
 export default function AppHeader() {
@@ -52,8 +35,18 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-30">
-      <HeaderSidebarTrigger />
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+       <Sheet>
+        <SheetTrigger asChild>
+          <Button size="icon" variant="outline" className="sm:hidden">
+            <PanelLeft className="h-5 w-5" />
+            <span className="sr-only">Toggle Menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="sm:max-w-xs bg-[--sidebar-background] text-[--sidebar-foreground] border-[--sidebar-border] p-0">
+          <AppSidebar />
+        </SheetContent>
+      </Sheet>
 
       <div className="w-full flex-1">
         {/* Search bar removed from here */}
