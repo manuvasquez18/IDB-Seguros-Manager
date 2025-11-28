@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { SeguroInfoTab } from '@/components/seguros/details/SeguroInfoTab';
 import { ColectivosTab } from '@/components/seguros/details/ColectivosTab';
 import { ContactosTab } from '@/components/seguros/details/ContactosTab';
 import { CorreosTab } from '@/components/seguros/details/CorreosTab';
@@ -15,13 +16,13 @@ import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTa
 import { PopupsTab } from '@/components/seguros/details/PopupsTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 
-type TabValue = 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'popups' | 'archivos';
+type TabValue = 'info' | 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'popups' | 'archivos';
 
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
   const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
-  const [activeTab, setActiveTab] = useState<TabValue>('colectivos');
+  const { user, isUserLoading: isAuthLoading } = useUser();
+  const [activeTab, setActiveTab] = useState<TabValue>('info');
 
   const seguroRef = useMemoFirebase(() => {
     // Only run the query if the user is authenticated and firestore is available
@@ -31,12 +32,20 @@ export default function SeguroDetailPage() {
 
   const { data: seguro, isLoading: isSeguroLoading } = useDoc<Seguro>(seguroRef);
 
-  const isLoading = isUserLoading || (user && isSeguroLoading);
+  const isLoading = isAuthLoading || (user && isSeguroLoading);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <p>Cargando detalles del seguro...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p>Por favor, inicia sesión para ver los detalles.</p>
       </div>
     );
   }
@@ -72,8 +81,9 @@ export default function SeguroDetailPage() {
         </div>
       </div>
       
-      <Tabs defaultValue="colectivos" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs defaultValue="info" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
+        <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="info">Información General</TabsTrigger>
           <TabsTrigger value="colectivos">Colectivos</TabsTrigger>
           <TabsTrigger value="contactos">Contactos</TabsTrigger>
           <TabsTrigger value="correos">Correos</TabsTrigger>
@@ -81,7 +91,10 @@ export default function SeguroDetailPage() {
           <TabsTrigger value="popups">Popups</TabsTrigger>
           <TabsTrigger value="archivos">Archivos</TabsTrigger>
         </TabsList>
-
+        
+        <TabsContent value="info">
+            <SeguroInfoTab seguro={seguro} />
+        </TabsContent>
         <TabsContent value="colectivos">
           <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'colectivos'} />
         </TabsContent>
