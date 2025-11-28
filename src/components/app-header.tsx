@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Bell, CircleUser } from "lucide-react";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
@@ -23,7 +22,6 @@ export default function AppHeader() {
   const { user } = useUser();
   const auth = useAuth();
   const { profile } = useUserProfile();
-  const avatar = PlaceHolderImages.find(p => p.id === 'user-avatar-1');
 
   const handleLogout = () => {
     auth.signOut();
@@ -53,15 +51,6 @@ export default function AppHeader() {
                   width={36}
                   height={36}
                   alt="User avatar"
-                  className="rounded-full"
-                />
-            ) : avatar ? (
-                <Image
-                  src={avatar.imageUrl}
-                  width={36}
-                  height={36}
-                  alt={avatar.description}
-                  data-ai-hint={avatar.imageHint}
                   className="rounded-full"
                 />
             ) : (

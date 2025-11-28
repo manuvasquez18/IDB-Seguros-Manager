@@ -14,32 +14,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
       },
       {
         protocol: 'https' ,
         hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https' ,
-        hostname: 'idbclinicas.com',
-        port: '',
-        pathname: '/**',
       },
       {
         protocol: 'https' ,
         hostname: 'citas.previmedicaidb.com',
-        port: '',
-        pathname: '/**',
       }
     ],
   },

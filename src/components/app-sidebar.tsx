@@ -14,25 +14,17 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
-  Shield,
-  Users,
-  BookUser,
-  Mail,
-  UserCog,
-  MessageSquare,
-  File,
+  Building,
   Settings,
   LogOut,
-  Building,
   User,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
-// We remove the sub-items from the main menu, as they will be accessed from the seguro details page.
 const menuItems = [
-  { href: "/seguros", label: "Seguros", icon: Shield, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin'] },
+  { href: "/seguros", label: "Seguros", icon: Building, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
 ];
 
 export default function AppSidebar() {

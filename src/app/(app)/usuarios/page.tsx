@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/definitions';
@@ -21,7 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,8 +32,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { useUserProfile } from '@/hooks/use-user-profile';
+
 
 function getInitials(name: string) {
+  if (!name) return 'U';
   const names = name.split(' ');
   if (names.length > 1) {
     return `${names[0][0]}${names[names.length - 1][0]}`;
@@ -44,12 +49,13 @@ function getInitials(name: string) {
 export default function UsuariosPage() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const { profile } = useUserProfile();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const usersQuery = useMemoFirebase(() => {
-    // Only create the query if the user is logged in
-    if (!firestore || !user) return null;
+    if (!firestore || !user || !profile || !['admin', 'supervisor'].includes(profile.rol)) return null;
     return collection(firestore, 'users');
-  }, [firestore, user]);
+  }, [firestore, user, profile]);
 
   const { data: users, isLoading: isUsersLoading } = useCollection<UserProfile>(usersQuery);
   
@@ -67,6 +73,16 @@ export default function UsuariosPage() {
         return 'outline';
     }
   };
+  
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    if (!searchTerm) return users;
+
+    return users.filter(user => 
+      (user.nombre && user.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [users, searchTerm]);
 
   if (isLoading) {
     return (
@@ -75,6 +91,15 @@ export default function UsuariosPage() {
       </div>
     );
   }
+  
+  if (profile && !['admin', 'supervisor'].includes(profile.rol)) {
+     return (
+      <div className="flex items-center justify-center h-full">
+        <p>No tienes permiso para ver esta página.</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -90,10 +115,24 @@ export default function UsuariosPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Usuarios Registrados</CardTitle>
-          <CardDescription>
-            Una lista de todos los usuarios en el sistema.
-          </CardDescription>
+           <div className="flex items-center justify-between gap-4">
+            <div>
+                <CardTitle>Usuarios Registrados</CardTitle>
+                <CardDescription>
+                Una lista de todos los usuarios en el sistema.
+                </CardDescription>
+            </div>
+             <div className="relative w-full max-w-sm">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Buscar por nombre, email..."
+                  className="w-full appearance-none bg-background pl-8 shadow-none"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -115,14 +154,14 @@ export default function UsuariosPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users && users.length > 0 ? (
-                users.map((user) => (
+              {filteredUsers && filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="hidden sm:table-cell">
                       <Avatar className="h-9 w-9">
                         <AvatarImage src={user.avatar_url} alt="Avatar" />
                         <AvatarFallback>
-                          {user.nombre ? getInitials(user.nombre) : 'U'}
+                          {getInitials(user.nombre)}
                         </AvatarFallback>
                       </Avatar>
                     </TableCell>
@@ -166,7 +205,7 @@ export default function UsuariosPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
-                    No se encontraron usuarios.
+                    {searchTerm ? 'No se encontraron usuarios con ese criterio.' : 'No se encontraron usuarios.'}
                   </TableCell>
                 </TableRow>
               )}
