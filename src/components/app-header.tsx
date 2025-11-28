@@ -34,6 +34,16 @@ export default function AppHeader() {
     }
   };
 
+  const profileLabel = () => {
+    if (profile) {
+      if(profile.nombre && profile.sucursal) {
+        return `${profile.nombre} (${profile.sucursal})`;
+      }
+      return profile.nombre;
+    }
+    return user?.email || 'Mi Cuenta';
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
        <Sheet>
@@ -60,7 +70,7 @@ export default function AppHeader() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{profile?.nombre || user?.email || 'Mi Cuenta'}</DropdownMenuLabel>
+          <DropdownMenuLabel>{profileLabel()}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             Cerrar Sesión
