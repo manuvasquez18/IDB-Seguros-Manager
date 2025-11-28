@@ -13,9 +13,8 @@ import { doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { v4 as uuidv4 } from 'uuid';
 import { Switch } from '@/components/ui/switch';
-import { FileUpload } from '@/components/ui/file-upload';
 
-type FieldType = 'text' | 'textarea' | 'email' | 'password' | 'switch' | 'file';
+type FieldType = 'text' | 'textarea' | 'email' | 'password' | 'switch';
 
 interface FormFieldConfig<T extends z.ZodObject<any, any, any>> {
   name: keyof z.infer<T>;
@@ -57,8 +56,6 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
     formFields.forEach(field => {
         if(field.type === 'switch') {
             initialValues[field.name as string] = false;
-        } else if (field.type === 'file') {
-            initialValues[field.name as string] = undefined;
         } else {
             initialValues[field.name as string] = '';
         }
@@ -76,14 +73,21 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
   });
 
   useEffect(() => {
-    form.reset(defaultValues);
-  }, [defaultValues, form]);
+    if (open) {
+      const newId = isEditMode ? selectedItem.id : uuidv4();
+      form.reset({
+        ...defaultValues,
+        ...(selectedItem || {}),
+        id: newId,
+      } as z.infer<T>);
+    }
+  }, [selectedItem, open, form, defaultValues, isEditMode]);
 
 
   const handleSubmit = (data: z.infer<T>) => {
-    if (!firestore || !selectedItem) return;
+    if (!firestore) return;
 
-    const itemId = selectedItem.id;
+    const itemId = selectedItem?.id ?? uuidv4();
     const docRef = doc(firestore, subcollectionPath, itemId);
     
     let transformedData = transformSubmitData ? transformSubmitData(data) : data;
@@ -98,16 +102,6 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
     if (isEditMode && omitEmptyPassword && 'password' in data && !data.password) {
         delete dataToSave.password;
     }
-    
-    // In edit mode, don't overwrite file info if a new file isn't provided
-    if (isEditMode && formFields.some(f => f.type === 'file') && !data.fileInfo) {
-      delete dataToSave.url_storage;
-      delete dataToSave.path_storage;
-      delete dataToSave.tipo_mime;
-      delete dataToSave.tamano_kb;
-      delete dataToSave.url;
-    }
-
 
     setDocumentNonBlocking(docRef, dataToSave, { merge: isEditMode });
     form.reset();
@@ -137,7 +131,7 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
                 name={fieldConfig.name as any}
                 render={({ field }) => (
                   <FormItem className={fieldConfig.type === 'switch' ? 'flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm' : ''}>
-                     {fieldConfig.type !== 'file' && <FormLabel>{fieldConfig.label}</FormLabel>}
+                    <FormLabel>{fieldConfig.label}</FormLabel>
                     <FormControl>
                       {fieldConfig.type === 'textarea' ? (
                         <Textarea placeholder={fieldConfig.placeholder} {...field} />
@@ -145,13 +139,6 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
                         <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                        />
-                      ) : fieldConfig.type === 'file' ? (
-                         <FileUpload 
-                            value={field.value} 
-                            onChange={field.onChange}
-                            uploadPath={`${subcollectionPath}/${selectedItem?.id}`}
-                            label={fieldConfig.label}
                         />
                       ) : (
                         <Input type={fieldConfig.type} placeholder={fieldConfig.placeholder} {...field} value={field.value ?? ''} />

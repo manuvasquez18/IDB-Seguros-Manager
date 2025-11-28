@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import type { Notificacion, FileUploadInfo } from '@/lib/definitions';
+import type { Notificacion } from '@/lib/definitions';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,6 @@ import { GenericSubcollectionSheet } from './GenericSubcollectionSheet';
 import { GenericSubcollectionTable } from './GenericSubcollectionTable';
 import * as z from "zod";
 import Link from 'next/link';
-import { v4 as uuidv4 } from 'uuid';
 
 interface NotificacionesTabProps {
   seguroId: string;
@@ -21,7 +20,7 @@ interface NotificacionesTabProps {
 const formSchema = z.object({
   titulo: z.string().min(1, "El título es obligatorio."),
   cuerpo: z.string().optional(),
-  fileInfo: z.custom<FileUploadInfo>().optional(),
+  url: z.string().url("Debe ser una URL válida.").optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -29,14 +28,14 @@ type FormValues = z.infer<typeof formSchema>;
 const formFields = [
   { name: 'titulo' as const, label: 'Título de la Notificación', type: 'text' as const, placeholder: 'Ej: Aviso Importante' },
   { name: 'cuerpo' as const, label: 'Cuerpo del Mensaje', type: 'textarea' as const, placeholder: 'Detalles del aviso...' },
-  { name: 'fileInfo' as const, label: 'Adjuntar Archivo (Opcional)', type: 'file' as const, placeholder: 'Sube un archivo' },
+  { name: 'url' as const, label: 'URL (Opcional)', type: 'text' as const, placeholder: 'https://...' },
 ];
 
 export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Partial<Notificacion> | undefined>(undefined);
+  const [selectedItem, setSelectedItem] = useState<Notificacion | undefined>(undefined);
 
   const subcollectionPath = `seguros/${seguroId}/notificaciones`;
 
@@ -53,7 +52,7 @@ export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps
 
   const handleAdd = () => {
     if (!canCreate) return;
-    setSelectedItem({ id: uuidv4() });
+    setSelectedItem(undefined);
     setSheetOpen(true);
   };
 
@@ -106,14 +105,8 @@ export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps
             formSchema={formSchema}
             formFields={formFields}
             selectedItem={selectedItem}
-            sheetTitle={selectedItem?.titulo ? "Editar Notificación" : "Añadir Nueva Notificación"}
-            sheetDescription={selectedItem?.titulo ? "Actualiza los detalles de la notificación." : "Rellena los datos para registrar una nueva notificación."}
-            transformSubmitData={(data) => ({
-                ...data,
-                url: data.fileInfo?.downloadURL,
-                path_storage: data.fileInfo?.filePath,
-                fileInfo: undefined, // Remove from final data
-            })}
+            sheetTitle={selectedItem ? "Editar Notificación" : "Añadir Nueva Notificación"}
+            sheetDescription={selectedItem ? "Actualiza los detalles de la notificación." : "Rellena los datos para registrar una nueva notificación."}
           />
         )}
       </CardContent>

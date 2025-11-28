@@ -85,7 +85,6 @@ export type Notificacion = {
     titulo: string;
     cuerpo?: string;
     url?: string;
-    path_storage?: string;
     created_at?: string;
     updated_at?: string;
 };
@@ -95,9 +94,6 @@ export type Archivo = {
     seguro_id: string;
     nombre: string;
     url_storage: string;
-    path_storage: string;
-    tipo_mime?: string;
-    tamano_kb?: number;
     comentario?: string;
     created_at?: string;
     updated_at?: string;
@@ -108,11 +104,4 @@ export interface UserProfileHookResult {
   profile: UserProfile | null;
   isLoading: boolean;
   error: Error | null;
-}
-
-export type FileUploadInfo = {
-    downloadURL: string;
-    filePath: string;
-    mimeType: string;
-    sizeKB: number;
 }

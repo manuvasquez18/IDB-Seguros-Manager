@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import type { Archivo, FileUploadInfo } from '@/lib/definitions';
+import type { Archivo } from '@/lib/definitions';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,6 @@ import { GenericSubcollectionSheet } from './GenericSubcollectionSheet';
 import { GenericSubcollectionTable } from './GenericSubcollectionTable';
 import * as z from "zod";
 import Link from 'next/link';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ArchivosTabProps {
   seguroId: string;
@@ -20,9 +19,7 @@ interface ArchivosTabProps {
 
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio."),
-  fileInfo: z.custom<FileUploadInfo>(val => val && typeof val === 'object' && 'downloadURL' in val, {
-    message: "Debe adjuntar un archivo."
-  }),
+  url_storage: z.string().url("Debe ser una URL válida."),
   comentario: z.string().optional(),
 });
 
@@ -30,7 +27,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const formFields = [
   { name: 'nombre' as const, label: 'Nombre del Archivo', type: 'text' as const, placeholder: 'Ej: Póliza General 2024' },
-  { name: 'fileInfo' as const, label: 'Archivo', type: 'file' as const, placeholder: 'Sube un archivo' },
+  { name: 'url_storage' as const, label: 'URL del Archivo', type: 'text' as const, placeholder: 'https://...' },
   { name: 'comentario' as const, label: 'Comentario', type: 'textarea' as const, placeholder: 'Notas sobre el archivo' },
 ];
 
@@ -38,7 +35,7 @@ export function ArchivosTab({ seguroId, isActive }: ArchivosTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Partial<Archivo> | undefined>(undefined);
+  const [selectedItem, setSelectedItem] = useState<Archivo | undefined>(undefined);
 
   const subcollectionPath = `seguros/${seguroId}/archivos`;
 
@@ -55,7 +52,7 @@ export function ArchivosTab({ seguroId, isActive }: ArchivosTabProps) {
 
   const handleAdd = () => {
     if (!canCreate) return;
-    setSelectedItem({ id: uuidv4() }); // Provide a temporary ID for the upload path
+    setSelectedItem(undefined);
     setSheetOpen(true);
   };
 
@@ -108,16 +105,8 @@ export function ArchivosTab({ seguroId, isActive }: ArchivosTabProps) {
             formSchema={formSchema}
             formFields={formFields}
             selectedItem={selectedItem}
-            sheetTitle={selectedItem?.nombre ? "Editar Archivo" : "Añadir Nuevo Archivo"}
-            sheetDescription={selectedItem?.nombre ? "Actualiza los detalles del archivo." : "Rellena los datos para registrar un nuevo archivo."}
-            transformSubmitData={(data) => ({
-                ...data,
-                url_storage: data.fileInfo.downloadURL,
-                path_storage: data.fileInfo.filePath,
-                tipo_mime: data.fileInfo.mimeType,
-                tamano_kb: data.fileInfo.sizeKB,
-                fileInfo: undefined, // Remove from final data
-            })}
+            sheetTitle={selectedItem ? "Editar Archivo" : "Añadir Nuevo Archivo"}
+            sheetDescription={selectedItem ? "Actualiza los detalles del archivo." : "Rellena los datos para registrar un nuevo archivo."}
           />
         )}
       </CardContent>
