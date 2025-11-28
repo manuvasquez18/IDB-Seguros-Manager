@@ -27,16 +27,10 @@ import {
 import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
-
+// We remove the sub-items from the main menu, as they will be accessed from the seguro details page.
 const menuItems = [
   { href: "/seguros", label: "Seguros", icon: Shield, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/colectivos", label: "Colectivos", icon: Users, roles: ['admin', 'supervisor'] },
-  { href: "/contactos", label: "Contactos", icon: BookUser, roles: ['admin', 'supervisor'] },
-  { href: "/correos", label: "Correos", icon: Mail, roles: ['admin', 'supervisor'] },
   { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin'] },
-  { href: "/usuarios_portal", label: "Usuarios de Portal", icon: UserCog, roles: ['admin', 'supervisor'] },
-  { href: "/popups", label: "Popups", icon: MessageSquare, roles: ['admin', 'supervisor'] },
-  { href: "/archivos", label: "Archivos", icon: File, roles: ['admin', 'supervisor'] },
 ];
 
 export default function AppSidebar() {

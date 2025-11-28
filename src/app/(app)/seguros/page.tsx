@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,6 +48,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 export default function SegurosPage() {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
+  const router = useRouter();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedSeguro, setSelectedSeguro] = useState<Seguro | undefined>(undefined);
@@ -63,6 +65,7 @@ export default function SegurosPage() {
   const canCreate = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canEdit = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canDelete = profile?.rol === 'admin';
+  const canViewDetails = true; // All roles can view details
 
   const handleAdd = () => {
     if (!canCreate) return;
@@ -74,6 +77,10 @@ export default function SegurosPage() {
     if (!canEdit) return;
     setSelectedSeguro(seguro);
     setSheetOpen(true);
+  };
+  
+  const handleViewDetails = (seguro: Seguro) => {
+    router.push(`/seguros/${seguro.id}`);
   };
 
   const openDeleteDialog = (seguro: Seguro) => {
@@ -120,7 +127,7 @@ export default function SegurosPage() {
           <CardHeader>
             <CardTitle>Seguros Registrados</CardTitle>
             <CardDescription>
-              Una lista de todos los seguros en el sistema.
+              Una lista de todos los seguros en el sistema. Haz clic en un seguro para ver sus detalles.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -141,7 +148,7 @@ export default function SegurosPage() {
               <TableBody>
                 {seguros && seguros.length > 0 ? (
                   seguros.map((seguro) => (
-                    <TableRow key={seguro.id}>
+                    <TableRow key={seguro.id} className="cursor-pointer" onClick={() => handleViewDetails(seguro)}>
                       <TableCell className="font-medium">{seguro.nombre}</TableCell>
                       <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
                       <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
@@ -151,7 +158,7 @@ export default function SegurosPage() {
                         </Badge>
                       </TableCell>
                       {(canEdit || canDelete) && (
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -161,8 +168,9 @@ export default function SegurosPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                              {canEdit && <DropdownMenuItem onSelect={() => handleEdit(seguro)}>Editar</DropdownMenuItem>}
-                              {canDelete && <DropdownMenuItem onSelect={() => openDeleteDialog(seguro)} className="text-destructive">Eliminar</DropdownMenuItem>}
+                               {canViewDetails && <DropdownMenuItem onSelect={() => handleViewDetails(seguro)}><Eye className="mr-2"/>Ver Detalles</DropdownMenuItem>}
+                              {canEdit && <DropdownMenuItem onSelect={() => handleEdit(seguro)}><Edit className="mr-2"/>Editar</DropdownMenuItem>}
+                              {canDelete && <DropdownMenuItem onSelect={() => openDeleteDialog(seguro)} className="text-destructive"><Trash2 className="mr-2"/>Eliminar</DropdownMenuItem>}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
