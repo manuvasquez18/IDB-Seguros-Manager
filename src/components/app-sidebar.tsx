@@ -6,7 +6,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Building,
-  LogOut,
   User,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
@@ -20,17 +19,7 @@ const menuItems = [
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const auth = useAuth();
   const { profile } = useUserProfile();
-  const router = useRouter();
-
-
-  const handleLogout = () => {
-    if(!auth) return;
-    auth.signOut().then(() => {
-      router.push('/login');
-    });
-  };
 
   const userCanView = (itemRoles: string[]) => {
     if (!profile || !profile.rol) return true; // Show all for now if no profile
@@ -44,8 +33,8 @@ export default function AppSidebar() {
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
-                  width={180}
-                  height={56}
+                  width={220}
+                  height={68}
                   className="object-contain"
                   priority
                 />
@@ -67,15 +56,6 @@ export default function AppSidebar() {
             ))}
           </nav>
         </div>
-        <nav className="mt-auto flex flex-col gap-2 p-4">
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground"
-              >
-                <LogOut className="h-5 w-5" />
-                <span>Cerrar Sesión</span>
-              </button>
-        </nav>
     </aside>
   );
 }
