@@ -72,13 +72,13 @@ export type UsuarioPortal = {
     id: string;
     seguro_id: string;
     usuario: string;
-    password?: string; // Should be handled securely, not stored plaintext
+    password?: string;
     comentario?: string;
     created_at?: string;
     updated_at?: string;
 };
 
-export type Popup = {
+export type Notificacion = {
     id: string;
     seguro_id: string;
     titulo: string;

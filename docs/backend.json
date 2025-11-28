@@ -106,8 +106,8 @@
       },
       "required": ["id", "seguro_id", "usuario", "password"]
     },
-    "Popup": {
-      "title": "Popup",
+    "Notificacion": {
+      "title": "Notificacion",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -186,10 +186,10 @@
         }
       },
       {
-        "path": "/seguros/{seguroId}/popups/{popupId}",
+        "path": "/seguros/{seguroId}/notificaciones/{notificacionId}",
         "definition": {
-          "schema": { "$ref": "#/entities/Popup" },
-          "description": "Subcollection for popups in an insurance policy."
+          "schema": { "$ref": "#/entities/Notificacion" },
+          "description": "Subcollection for notifications in an insurance policy."
         }
       },
       {

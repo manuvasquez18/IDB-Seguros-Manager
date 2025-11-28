@@ -13,10 +13,10 @@ import { ColectivosTab } from '@/components/seguros/details/ColectivosTab';
 import { ContactosTab } from '@/components/seguros/details/ContactosTab';
 import { CorreosTab } from '@/components/seguros/details/CorreosTab';
 import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTab';
-import { PopupsTab } from '@/components/seguros/details/PopupsTab';
+import { NotificacionesTab } from '@/components/seguros/details/NotificacionesTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 
-type TabValue = 'info' | 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'popups' | 'archivos';
+type TabValue = 'info' | 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'notificaciones' | 'archivos';
 
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
@@ -88,7 +88,7 @@ export default function SeguroDetailPage() {
           <TabsTrigger value="contactos">Contactos</TabsTrigger>
           <TabsTrigger value="correos">Correos</TabsTrigger>
           <TabsTrigger value="usuarios_portal">Usuarios Portal</TabsTrigger>
-          <TabsTrigger value="popups">Popups</TabsTrigger>
+          <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
           <TabsTrigger value="archivos">Archivos</TabsTrigger>
         </TabsList>
         
@@ -107,8 +107,8 @@ export default function SeguroDetailPage() {
         <TabsContent value="usuarios_portal">
            <UsuariosPortalTab seguroId={seguro.id} isActive={activeTab === 'usuarios_portal'} />
         </TabsContent>
-        <TabsContent value="popups">
-          <PopupsTab seguroId={seguro.id} isActive={activeTab === 'popups'} />
+        <TabsContent value="notificaciones">
+          <NotificacionesTab seguroId={seguro.id} isActive={activeTab === 'notificaciones'} />
         </TabsContent>
         <TabsContent value="archivos">
           <ArchivosTab seguroId={seguro.id} isActive={activeTab === 'archivos'} />
