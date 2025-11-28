@@ -43,7 +43,7 @@ export default function AppSidebar() {
           <div className="flex h-16 items-center justify-center px-6 mb-4">
              <Link href="/seguros">
                  <Image 
-                  src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+                  src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
                   width={150}
                   height={50}
@@ -79,4 +79,5 @@ export default function AppSidebar() {
     </aside>
   );
 }
+
 
