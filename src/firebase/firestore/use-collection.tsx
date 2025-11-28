@@ -67,7 +67,7 @@ export function useCollection<T = any>(
       setData(null);
       setIsLoading(false); // Not loading because we aren't fetching.
       setError(null);
-      return;
+      return; // Stop execution of the effect.
     }
 
     setIsLoading(true);
