@@ -84,7 +84,6 @@ export type Notificacion = {
     titulo: string;
     cuerpo?: string;
     url?: string;
-    activo: boolean;
     created_at?: string;
     updated_at?: string;
 };

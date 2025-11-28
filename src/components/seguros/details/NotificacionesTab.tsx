@@ -10,7 +10,6 @@ import { PlusCircle } from 'lucide-react';
 import { GenericSubcollectionSheet } from './GenericSubcollectionSheet';
 import { GenericSubcollectionTable } from './GenericSubcollectionTable';
 import * as z from "zod";
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 interface NotificacionesTabProps {
@@ -22,7 +21,6 @@ const formSchema = z.object({
   titulo: z.string().min(1, "El título es obligatorio."),
   cuerpo: z.string().optional(),
   url: z.string().url("Debe ser una URL válida.").optional().or(z.literal('')),
-  activo: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -31,7 +29,6 @@ const formFields = [
   { name: 'titulo' as const, label: 'Título de la Notificación', type: 'text' as const, placeholder: 'Ej: Aviso Importante' },
   { name: 'url' as const, label: 'URL (Opcional)', type: 'text' as const, placeholder: 'https://ejemplo.com/info' },
   { name: 'cuerpo' as const, label: 'Cuerpo del Mensaje', type: 'textarea' as const, placeholder: 'Detalles del aviso...' },
-  { name: 'activo' as const, label: 'Notificación Activa', type: 'switch' as const },
 ];
 
 export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps) {
@@ -73,11 +70,7 @@ export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps
       render: (item: Notificacion) => item.url ? <Link href={item.url} target="_blank" className="text-primary underline">{item.url}</Link> : 'N/A',
       className: 'hidden md:table-cell' 
     },
-    { 
-      key: 'activo' as const, 
-      header: 'Activo',
-      render: (item: Notificacion) => <Badge variant={item.activo ? 'default' : 'destructive'}>{item.activo ? 'Sí' : 'No'}</Badge>
-    },
+    { key: 'cuerpo' as const, header: 'Cuerpo', className: 'hidden md:table-cell' },
   ];
 
   return (

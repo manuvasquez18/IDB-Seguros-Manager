@@ -115,11 +115,10 @@
         "titulo": { "type": "string" },
         "cuerpo": { "type": "string" },
         "url": { "type": "string", "format": "uri" },
-        "activo": { "type": "boolean" },
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "seguro_id", "titulo", "activo"]
+      "required": ["id", "seguro_id", "titulo"]
     },
     "Archivo": {
       "title": "Archivo",
