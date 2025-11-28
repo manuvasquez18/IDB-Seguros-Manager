@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -157,7 +158,7 @@ export function SeguroForm({ onSubmit, defaultValues, isEditMode }: SeguroFormPr
           <TabsContent value="consignacion" className="space-y-4 pt-4 max-h-[60vh] overflow-y-auto pr-4">
             <FormField control={form.control} name="cons_protocolo" render={({ field }) => ( <FormItem> <FormLabel>Protocolo de Consignación</FormLabel> <FormControl><Input placeholder="Protocolo a seguir" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
             <FormField control={form.control} name="cons_modalidad" render={({ field }) => ( <FormItem> <FormLabel>Modalidad</FormLabel> <FormControl><Input placeholder="Ej: Digital, Físico" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-            <FormField control={form.control} name="cons_copiar_a" render={({ field }) => ( <FormItem> <FormLabel>Copiar a (Email)</FormLabel> <FormControl><Input type="email" placeholder="correo@ejemplo.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+            <FormField control={form.control} name="cons_copiar_a" render={({ field }) => ( <FormItem> <FormLabel>Copiar a (Email)</FormLabel> <FormControl><Input type="text" placeholder="correo@ejemplo.com, otro@ejemplo.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
             <FormField control={form.control} name="cons_horario" render={({ field }) => ( <FormItem> <FormLabel>Horario</FormLabel> <FormControl><Input placeholder="Ej: Lunes a Viernes de 9am a 5pm" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
             <FormField control={form.control} name="cons_documentos" render={({ field }) => ( <FormItem> <FormLabel>Documentos Requeridos</FormLabel> <FormControl><Textarea placeholder="Liste los documentos necesarios" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
             <FormField control={form.control} name="cons_comentario" render={({ field }) => ( <FormItem> <FormLabel>Comentarios de Consignación</FormLabel> <FormControl><Textarea placeholder="Notas adicionales sobre la consignación" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
