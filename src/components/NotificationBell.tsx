@@ -1,4 +1,3 @@
-
 'use client';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collectionGroup, query, orderBy, limit } from 'firebase/firestore';
@@ -18,11 +17,11 @@ import Link from 'next/link';
 
 export function NotificationBell() {
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
 
   const notificationsQuery = useMemoFirebase(() => {
-    // Only run the query if the user is authenticated
-    if (!firestore || !user) return null;
+    // Wait until auth state is determined and user is logged in.
+    if (isUserLoading || !user || !firestore) return null;
     
     // Query the 'notificaciones' collection group
     return query(
@@ -30,7 +29,7 @@ export function NotificationBell() {
       orderBy('created_at', 'desc'), 
       limit(20)
     );
-  }, [firestore, user]);
+  }, [firestore, user, isUserLoading]);
 
   // The hook will now wait until the query is not null
   const { data: notifications, isLoading } = useCollection<Notificacion>(notificationsQuery);
@@ -40,7 +39,7 @@ export function NotificationBell() {
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" size="icon" className="rounded-full relative">
           <Bell className="h-5 w-5" />
-          {notifications && notifications.length > 0 && (
+          {!isLoading && notifications && notifications.length > 0 && (
              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
           )}
           <span className="sr-only">Toggle notifications</span>
