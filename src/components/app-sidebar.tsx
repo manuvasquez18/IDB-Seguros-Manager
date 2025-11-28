@@ -52,7 +52,7 @@ export default function AppSidebar() {
           </div>
         <div className="flex flex-col gap-2 p-4">
           
-          <nav className="flex flex-col gap-2 px-4">
+          <nav className="flex flex-col gap-2 px-2">
             {menuItems.map((item) => (
               userCanView(item.roles) && (
                 <Link
