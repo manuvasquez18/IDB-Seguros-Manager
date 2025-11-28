@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -13,18 +14,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth, initiateEmailSignIn } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        router.push("/seguros");
+      }
+    });
+    return () => unsubscribe();
+  }, [auth, router]);
+
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     const email = (event.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
     const password = (event.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
+    
     initiateEmailSignIn(auth, email, password);
-    router.push("/seguros");
+    // Let onAuthStateChanged handle the redirect
   };
 
   return (
@@ -56,8 +76,8 @@ export default function LoginPage() {
             </div>
             <Input id="password" name="password" type="password" required />
           </div>
-          <Button type="submit" className="w-full">
-            Iniciar Sesión
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
           </Button>
           <Button variant="outline" className="w-full" disabled>
             Iniciar Sesión con Google

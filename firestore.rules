@@ -44,6 +44,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSignedIn();
+      // Only the user themselves can create their own profile document.
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
@@ -62,7 +63,7 @@ service cloud.firestore {
       // Only admins can delete.
       allow delete: if isAdmin();
       
-      // Subcollection rules inherit the parent's logic for simplicity
+      // Subcollection rules
       match /{allSubcollections}/{docId} {
         allow read: if isSignedIn();
         allow create: if isAdmin() || isSupervisor();

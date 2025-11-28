@@ -17,61 +17,67 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { doc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function RegisterPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formValues, setFormValues] = useState({ email: '', password: '', firstName: '', lastName: '' });
+  
+  // This state will hold the details from the form to be used by the auth state listener
+  const [pendingUserDetails, setPendingUserDetails] = useState<{ email: string; firstName: string; lastName: string } | null>(null);
+
+  useEffect(() => {
+    if (!auth || !firestore || !pendingUserDetails) return;
+
+    // This effect runs when a user is successfully created by Firebase Auth
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+      // Check if there's a new user and if their email matches the one from the form
+      if (user && user.email === pendingUserDetails.email) {
+        
+        // Create the user profile document in Firestore
+        const userRef = doc(firestore, `users/${user.uid}`);
+        setDocumentNonBlocking(userRef, {
+            id: user.uid,
+            nombre: `${pendingUserDetails.firstName} ${pendingUserDetails.lastName}`.trim(),
+            email: user.email,
+            rol: 'supervisor', // Default role
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        }, { merge: true }); // Use merge to be safe
+        
+        // Clear the pending details to prevent this from running again
+        setPendingUserDetails(null);
+        
+        // Redirect to the main app page
+        router.push("/seguros");
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on component unmount
+  }, [auth, firestore, router, pendingUserDetails]);
+
 
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const firstName = formData.get("first-name") as string;
     const lastName = formData.get("last-name") as string;
 
-    setFormValues({ email, password, firstName, lastName });
-    setIsSubmitting(true);
+    // Store form details to be used by the useEffect listener
+    setPendingUserDetails({ email, firstName, lastName });
     
-    // Non-blocking call to Firebase Auth
+    // Initiate the non-blocking sign-up process.
+    // The useEffect above will handle profile creation and redirection.
     initiateEmailSignUp(auth, email, password);
   };
-  
-  useEffect(() => {
-    if (!auth || !firestore || !isSubmitting) return;
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // We only want to act when the user is created and matches the form submission
-      if (user && user.email === formValues.email) {
-        
-        // Create user profile document in Firestore
-        const userRef = doc(firestore, `users/${user.uid}`);
-        setDocumentNonBlocking(userRef, {
-            id: user.uid,
-            nombre: `${formValues.firstName} ${formValues.lastName}`.trim() || user.email?.split('@')[0],
-            email: user.email,
-            rol: 'supervisor', // Assign supervisor role
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        }, { merge: true });
-        
-        // The custom claim logic is removed. We rely on the Firestore document now.
-        // A short delay helps ensure the Firestore write has initiated before redirecting.
-        setTimeout(() => {
-            router.push("/seguros");
-            // No need to reset submission state here, as we are navigating away.
-        }, 1000); 
-      }
-    });
-
-    return () => unsubscribe(); // Cleanup subscription on component unmount
-  }, [auth, firestore, router, isSubmitting, formValues]);
-
 
   return (
     <Card className="mx-auto max-w-sm w-full">
@@ -124,3 +130,4 @@ export default function RegisterPage() {
     </Card>
   );
 }
+
