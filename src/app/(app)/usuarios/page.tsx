@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { useCollection, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
+import { collection, doc, setDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import type { UserProfile } from '@/lib/definitions';
 import {
   Card,
@@ -22,7 +23,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal, Search } from 'lucide-react';
+import { MoreHorizontal, Search, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -34,6 +35,8 @@ import {
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { useToast } from '@/hooks/use-toast';
+import { UserSheet } from '@/components/usuarios/user-sheet';
 
 
 function getInitials(name: string) {
@@ -51,6 +54,10 @@ export default function UsuariosPage() {
   const { user, isUserLoading } = useUser();
   const { profile } = useUserProfile();
   const [searchTerm, setSearchTerm] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const { toast } = useToast();
+  const auth = useAuth();
+
 
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !user || !profile || !['admin', 'supervisor'].includes(profile.rol)) return null;
@@ -60,6 +67,8 @@ export default function UsuariosPage() {
   const { data: users, isLoading: isUsersLoading } = useCollection<UserProfile>(usersQuery);
   
   const isLoading = isUserLoading || (user && isUsersLoading);
+  
+  const canCreate = profile?.rol === 'admin';
 
   const getRoleVariant = (role: string) => {
     switch (role) {
@@ -83,6 +92,11 @@ export default function UsuariosPage() {
       (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [users, searchTerm]);
+  
+  const handleAddUser = () => {
+    if (!canCreate) return;
+    setSheetOpen(true);
+  }
 
   if (isLoading) {
     return (
@@ -102,119 +116,130 @@ export default function UsuariosPage() {
 
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-          <p className="text-muted-foreground">
-            Administra los usuarios y sus roles en el sistema.
-          </p>
-        </div>
-        {/* Futuro botón para añadir usuario manualmente */}
-      </div>
-
-      <Card>
-        <CardHeader>
-           <div className="flex items-center justify-between gap-4">
-            <div>
-                <CardTitle>Usuarios Registrados</CardTitle>
-                <CardDescription>
-                Una lista de todos los usuarios en el sistema.
-                </CardDescription>
-            </div>
-             <div className="relative w-full max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Buscar por nombre, email..."
-                  className="w-full appearance-none bg-background pl-8 shadow-none"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+    <>
+      <div className="flex flex-col gap-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
+            <p className="text-muted-foreground">
+              Administra los usuarios y sus roles en el sistema.
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Avatar</span>
-                </TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead className="hidden md:table-cell">Activo</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Fecha de Creación
-                </TableHead>
-                <TableHead>
-                  <span className="sr-only">Acciones</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers && filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="hidden sm:table-cell">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.avatar_url} alt="Avatar" />
-                        <AvatarFallback>
-                          {getInitials(user.nombre)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell className="font-medium">{user.nombre}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleVariant(user.rol)}>
-                        {user.rol}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <Badge variant={user.is_active ? 'default' : 'inactive'}>
-                        {user.is_active ? 'Sí' : 'No'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : 'N/A'}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <DropdownMenuItem>Editar Rol</DropdownMenuItem>
-                          <DropdownMenuItem>
-                            {user.is_active ? 'Desactivar' : 'Activar'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            Eliminar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+          {canCreate && (
+             <Button onClick={handleAddUser}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Crear Usuario
+            </Button>
+          )}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                  <CardTitle>Usuarios Registrados</CardTitle>
+                  <CardDescription>
+                  Una lista de todos los usuarios en el sistema.
+                  </CardDescription>
+              </div>
+              <div className="relative w-full max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Buscar por nombre, email..."
+                    className="w-full appearance-none bg-background pl-8 shadow-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Avatar</span>
+                  </TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead className="hidden md:table-cell">Activo</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Fecha de Creación
+                  </TableHead>
+                  <TableHead>
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers && filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="hidden sm:table-cell">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={user.avatar_url} alt="Avatar" />
+                          <AvatarFallback>
+                            {getInitials(user.nombre)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TableCell>
+                      <TableCell className="font-medium">{user.nombre}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={getRoleVariant(user.rol)}>
+                          {user.rol}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant={user.is_active ? 'default' : 'inactive'}>
+                          {user.is_active ? 'Sí' : 'No'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                            <DropdownMenuItem>Editar Rol</DropdownMenuItem>
+                            <DropdownMenuItem>
+                              {user.is_active ? 'Desactivar' : 'Activar'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      {searchTerm ? 'No se encontraron usuarios con ese criterio.' : 'No se encontraron usuarios.'}
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    {searchTerm ? 'No se encontraron usuarios con ese criterio.' : 'No se encontraron usuarios.'}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+      {canCreate && (
+        <UserSheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+        />
+      )}
+    </>
   );
 }
-
-    
