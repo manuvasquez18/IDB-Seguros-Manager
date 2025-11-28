@@ -31,12 +31,12 @@
     --radius: 0.5rem;
     
     /* Sidebar specific colors */
-    --sidebar-background: 221 83% 53%; /* Blue background */
+    --sidebar-background: 201 100% 18%; /* #003b5c */
     --sidebar-foreground: 210 40% 98%; /* White-ish text */
-    --sidebar-muted-foreground: 221 83% 80%; /* Lighter blue for muted text */
+    --sidebar-muted-foreground: 201 30% 60%; /* Lighter blue for muted text */
     --sidebar-active-background: 0 0% 100%; /* White background for active item */
-    --sidebar-active-foreground: 221 83% 53%; /* Blue text for active item */
-    --sidebar-hover-background: 221 83% 60%; /* Slightly darker blue on hover */
+    --sidebar-active-foreground: 201 100% 18%; /* Dark blue text for active item */
+    --sidebar-hover-background: 201 100% 25%; /* Slightly lighter blue on hover */
   }
   .dark {
     --background: 222.2 84% 4.9%;
