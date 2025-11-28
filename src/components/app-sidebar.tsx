@@ -39,7 +39,7 @@ export default function AppSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-background sm:flex bg-[--sidebar-background] text-[--sidebar-foreground]">
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
         <div className="flex flex-col gap-2 p-4">
           <div className="flex h-16 items-center justify-center px-6 mb-4">
              <Link href="/seguros">
@@ -59,7 +59,7 @@ export default function AppSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:bg-sidebar-accent/50 ${pathname.startsWith(item.href) ? "bg-sidebar-accent/60" : ""}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${pathname.startsWith(item.href) ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"}`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -71,14 +71,14 @@ export default function AppSidebar() {
         <nav className="mt-auto flex flex-col gap-2 p-4">
               <Link
                 href="/settings"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent`}
               >
                 <Settings className="h-5 w-5" />
                  <span>Configuración</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground hover:bg-sidebar-accent"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Cerrar Sesión</span>
@@ -87,5 +87,3 @@ export default function AppSidebar() {
     </aside>
   );
 }
-
-    
