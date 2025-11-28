@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { CircleUser, PanelLeft } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import AppSidebar from "@/components/app-sidebar";
 
 
@@ -54,6 +54,9 @@ export default function AppHeader() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="sm:max-w-xs bg-[--sidebar-background] text-[--sidebar-foreground] border-[--sidebar-border] p-0">
+           <SheetHeader className="p-4">
+              <SheetTitle className="sr-only">Menú de Navegación</SheetTitle>
+           </SheetHeader>
           <AppSidebar />
         </SheetContent>
       </Sheet>
