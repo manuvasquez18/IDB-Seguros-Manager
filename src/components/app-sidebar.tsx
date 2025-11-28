@@ -40,14 +40,15 @@ export default function AppSidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
         <div className="flex flex-col gap-2 p-4">
-          <div className="flex h-16 items-center justify-center px-6 mb-4">
+          <div className="flex h-16 items-center px-4 mb-4">
              <Link href="/seguros">
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
-                  width={150}
-                  height={50}
+                  width={200}
+                  height={60}
                   className="object-contain"
+                  priority
                 />
              </Link>
           </div>
@@ -58,7 +59,7 @@ export default function AppSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-3 transition-all text-sidebar-foreground hover:font-bold ${pathname.startsWith(item.href) ? "font-bold" : ""}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-3 transition-all text-sidebar-foreground ${pathname.startsWith(item.href) ? "font-bold" : ""}`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -70,7 +71,7 @@ export default function AppSidebar() {
         <nav className="mt-auto flex flex-col gap-2 p-4">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground hover:font-bold"
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sidebar-foreground/80 transition-all hover:text-sidebar-foreground"
               >
                 <LogOut className="h-5 w-5" />
                 <span>Cerrar Sesión</span>

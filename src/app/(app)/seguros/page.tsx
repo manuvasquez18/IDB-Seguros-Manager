@@ -20,14 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -156,10 +149,7 @@ export default function SegurosPage() {
                   <TableHead className="hidden md:table-cell">Contacto</TableHead>
                   <TableHead className="hidden lg:table-cell">RIF</TableHead>
                   <TableHead>Estatus</TableHead>
-                  <TableHead className="hidden md:table-cell">Última Actualización</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Acciones</span>
-                  </TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -174,29 +164,16 @@ export default function SegurosPage() {
                           {seguro.estatus}
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.updated_at ? new Date(seguro.updated_at).toLocaleDateString() : ''}</TableCell>
-                      
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                               {canViewDetails && <DropdownMenuItem onSelect={() => handleViewDetails(seguro)}><Eye className="mr-2"/>Ver Detalles</DropdownMenuItem>}
-                              {canEdit && <DropdownMenuItem onSelect={() => handleEdit(seguro)}><Edit className="mr-2"/>Editar</DropdownMenuItem>}
-                              {canDelete && <DropdownMenuItem onSelect={() => openDeleteDialog(seguro)} className="text-destructive"><Trash2 className="mr-2"/>Eliminar</DropdownMenuItem>}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell className="text-right space-x-2">
+                           {canViewDetails && <Button variant="outline" size="icon" onClick={() => handleViewDetails(seguro)}><Eye className="h-4 w-4" /></Button>}
+                           {canEdit && <Button variant="outline" size="icon" onClick={() => handleEdit(seguro)}><Edit className="h-4 w-4" /></Button>}
+                           {canDelete && <Button variant="destructive" size="icon" onClick={() => openDeleteDialog(seguro)}><Trash2 className="h-4 w-4" /></Button>}
                         </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center h-24">
+                    <TableCell colSpan={5} className="text-center h-24">
                       {searchTerm ? 'No se encontraron seguros con ese criterio.' : 'No se encontraron seguros.'}
                     </TableCell>
                   </TableRow>
@@ -231,5 +208,3 @@ export default function SegurosPage() {
     </>
   );
 }
-
-    
