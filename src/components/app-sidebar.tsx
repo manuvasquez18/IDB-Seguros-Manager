@@ -29,7 +29,7 @@ export default function AppSidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-[hsl(var(--sidebar-background))] sm:flex">
         <div className="flex h-20 items-center justify-center px-6">
-             <Link href="/seguros" className="relative h-10 w-32">
+             <Link href="/seguros" className="relative h-16 w-40">
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
