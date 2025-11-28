@@ -82,7 +82,7 @@ export default function LoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Contraseña</Label>
-                <Link href="#" className="ml-auto inline-block text-sm underline">
+                <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
@@ -101,4 +101,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
