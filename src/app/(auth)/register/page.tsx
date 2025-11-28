@@ -12,48 +12,65 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth, initiateEmailSignUp } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, User } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
 
 export default function RegisterPage() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
-
-    // This listener will simply redirect the user once they are logged in.
-    // The user profile creation is now handled by a server-side Cloud Function.
-    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, redirect to the main app.
         router.push("/seguros");
       }
     });
-
-    // Cleanup subscription on component unmount
     return () => unsubscribe();
   }, [auth, router]);
 
-
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSubmitting || !auth) return;
+    if (isSubmitting || !auth || !firestore) return;
 
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
+    const firstName = formData.get("first-name") as string;
+    const lastName = formData.get("last-name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    
-    // Initiate the sign-up process.
-    // The onAuthStateChanged listener will handle redirection upon success.
-    initiateEmailSignUp(auth, email, password);
+    const nombre = `${firstName} ${lastName}`;
 
-    // No need to manually set isSubmitting to false, as the redirect will unmount the component.
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Now that the user is created in Auth, create their profile in Firestore.
+      const userProfile = {
+        id: user.uid,
+        nombre: nombre,
+        email: user.email,
+        rol: "supervisor", // Default role for new users
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      await setDoc(doc(firestore, "users", user.uid), userProfile);
+      
+      // onAuthStateChanged will handle the redirect.
+
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setIsSubmitting(false);
+      // Optionally, show an error message to the user
+    }
   };
 
   return (

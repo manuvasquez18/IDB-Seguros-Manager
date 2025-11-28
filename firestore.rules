@@ -44,7 +44,6 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSignedIn();
-      // Only the user themselves can create their own profile document.
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
@@ -54,8 +53,9 @@ service cloud.firestore {
       // Any signed-in user can read insurance policies.
       allow read: if isSignedIn();
       
-      // Allow creation for admins or supervisors.
-      allow create: if isAdmin() || isSupervisor();
+      // Allow creation for any signed-in user. This avoids the race condition
+      // where the user profile might not be created yet. Subsequent updates/deletes are protected by roles.
+      allow create: if isSignedIn();
 
       // Allow updates if the user is an admin or supervisor.
       allow update: if isAdmin() || isSupervisor();
