@@ -27,11 +27,11 @@ export default function AppSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-card sm:flex">
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-[hsl(var(--sidebar-background))] sm:flex">
         <div className="flex h-20 items-center justify-center px-6">
              <Link href="/seguros" className="flex items-center gap-2 font-semibold">
                  <Image 
-                  src="https://idbclinicas.com/wp-content/uploads/2017/09/IDB-clinicas-logo.png"
+                  src="https://citasprevimedicaidb.com/assets/images/logo_IDB.png"
                   alt="IDB Clinicas Logo"
                   width={120}
                   height={34}
@@ -50,8 +50,8 @@ export default function AppSidebar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
-                      isActive && "bg-muted text-primary"
+                      "flex items-center gap-3 rounded-lg px-3 py-3 text-[hsl(var(--sidebar-muted-foreground))] transition-all hover:text-[hsl(var(--sidebar-foreground))] hover:bg-[hsl(var(--sidebar-hover-background))]",
+                      isActive && "bg-[hsl(var(--sidebar-active-background))] text-[hsl(var(--sidebar-active-foreground))]"
                     )}
                   >
                     <item.icon className="h-5 w-5" />
