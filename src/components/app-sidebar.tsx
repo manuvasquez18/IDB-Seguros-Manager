@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -53,7 +54,7 @@ export default function AppSidebar() {
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-2 justify-center group-data-[collapsible=icon]:justify-center">
           <Image 
-            src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+            src="https://citas.previmedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
             alt="IDB Previmédica Logo"
             width={150}
             height={40}

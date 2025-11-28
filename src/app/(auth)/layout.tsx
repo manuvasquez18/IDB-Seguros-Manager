@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 import Image from "next/image";
 
@@ -10,7 +11,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="hidden bg-primary lg:flex items-center justify-center p-12">
         <div className="flex flex-col items-center justify-center h-full text-primary-foreground text-center">
             <Image
-                src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+                src="https://citas.previmedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
                 alt="IDB Seguros Logo"
                 width={250}
                 height={100}

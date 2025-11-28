@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -36,7 +37,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https' ,
-        hostname: 'citasprevimedicaidb.com',
+        hostname: 'citas.previmedicaidb.com',
         port: '',
         pathname: '/**',
       }
