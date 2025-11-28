@@ -88,21 +88,25 @@ export default function SeguroDetailPage() {
           <TabsTrigger value="archivos">Archivos</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="info">
-            <SeguroInfoTab seguro={seguro} isActive={activeTab === 'info'} />
+        <TabsContent value="info" forceMount={activeTab !== 'info'}>
+            {activeTab === 'info' && <SeguroInfoTab seguro={seguro} isActive={true} />}
         </TabsContent>
-        <TabsContent value="colectivos">
-          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'colectivos'} />
+        <TabsContent value="colectivos" forceMount={activeTab !== 'colectivos'}>
+          {activeTab === 'colectivos' && <ColectivosTab seguroId={seguro.id} isActive={true} />}
         </TabsContent>
-        <TabsContent value="contactos_correos" className="space-y-6">
-          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'contactos_correos'} />
-          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'contactos_correos'} />
+        <TabsContent value="contactos_correos" className="space-y-6" forceMount={activeTab !== 'contactos_correos'}>
+          {activeTab === 'contactos_correos' && (
+            <>
+              <ContactosTab seguroId={seguro.id} isActive={true} />
+              <CorreosTab seguroId={seguro.id} isActive={true} />
+            </>
+          )}
         </TabsContent>
-        <TabsContent value="usuarios_portal">
-           <UsuariosPortalTab seguroId={seguro.id} isActive={activeTab === 'usuarios_portal'} />
+        <TabsContent value="usuarios_portal" forceMount={activeTab !== 'usuarios_portal'}>
+           {activeTab === 'usuarios_portal' && <UsuariosPortalTab seguroId={seguro.id} isActive={true} />}
         </TabsContent>
-        <TabsContent value="archivos">
-          <ArchivosTab seguroId={seguro.id} isActive={activeTab === 'archivos'} />
+        <TabsContent value="archivos" forceMount={activeTab !== 'archivos'}>
+          {activeTab === 'archivos' && <ArchivosTab seguroId={seguro.id} isActive={true} />}
         </TabsContent>
       </Tabs>
     </div>

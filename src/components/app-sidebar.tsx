@@ -9,6 +9,7 @@ import {
   User,
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { cn } from "@/lib/utils";
 
 
 const menuItems = [
@@ -26,33 +27,39 @@ export default function AppSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
-        <div className="flex h-20 items-center justify-center px-4 mb-4">
-             <Link href="/seguros">
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-card sm:flex">
+        <div className="flex h-20 items-center justify-center px-6">
+             <Link href="/seguros" className="flex items-center gap-2 font-semibold">
                  <Image 
-                  src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
+                  src="https://idbclinicas.com/wp-content/uploads/2017/09/IDB-clinicas-logo.png"
                   alt="IDB Clinicas Logo"
-                  width={220}
-                  height={68}
+                  width={120}
+                  height={34}
                   className="object-contain"
                   priority
                 />
              </Link>
         </div>
-        <div className="flex flex-col gap-2 p-4">
-          <nav className="flex flex-col gap-2">
-            {menuItems.map((item) => (
-              userCanView(item.roles) && (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            ))}
+        <div className="flex-1">
+          <nav className="grid items-start px-4 text-sm font-medium">
+            {menuItems.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              return (
+                userCanView(item.roles) && (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
+                      isActive && "bg-muted text-primary"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              );
+            })}
           </nav>
         </div>
     </aside>
