@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Building,
-  Settings,
   LogOut,
   User,
 } from "lucide-react";
@@ -80,14 +79,6 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-2 mt-auto">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{children: "Configuración", side: "right"}}>
-              <Link href="/settings">
-                <Settings />
-                <span>Configuración</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip={{children: "Cerrar Sesión", side: "right"}}>
               <>
