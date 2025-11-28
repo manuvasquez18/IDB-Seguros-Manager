@@ -69,3 +69,5 @@ export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
     </Sheet>
   );
 }
+
+    

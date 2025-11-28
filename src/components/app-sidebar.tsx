@@ -9,23 +9,14 @@ import {
   LogOut,
   User,
   Settings,
-  ClipboardPlus,
-  BarChart3,
-  HeartPulse,
-  Users,
-  Stethoscope,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
 
 const menuItems = [
-  { href: "/citas", label: "Citas", icon: ClipboardPlus, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/emergencia", label: "Emergencia", icon: HeartPulse, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/estadisticas", label: "Estadísticas", icon: BarChart3, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/medicos", label: "Médicos", icon: Stethoscope, roles: ['admin', 'supervisor', 'usuario'] },
-  { href: "/seguros", label: "Paciente", icon: Users, roles: ['admin', 'supervisor', 'usuario'] },
-  // { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
+  { href: "/seguros", label: "Seguros", icon: Building, roles: ['admin', 'supervisor', 'usuario'] },
+  { href: "/usuarios", label: "Usuarios", icon: User, roles: ['admin', 'supervisor'] },
 ];
 
 export default function AppSidebar() {
@@ -61,19 +52,14 @@ export default function AppSidebar() {
                 />
              </Link>
           </div>
-          <div className="flex flex-col p-4 text-sm">
-            <span className="font-bold">{profile?.nombre}</span>
-            <span className="text-xs">{profile?.rol === 'admin' ? 'Gerencia Clínica' : 'Usuario'}</span>
-            <span className="text-xs">Centro de Urgencias Pediatrica</span>
-          </div>
-
+          
           <nav className="flex flex-col gap-2 px-4">
             {menuItems.map((item) => (
               userCanView(item.roles) && (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-primary-foreground hover:bg-sidebar-accent`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-primary-foreground hover:bg-sidebar-accent ${pathname.startsWith(item.href) ? "bg-sidebar-accent text-sidebar-primary-foreground" : ""}`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -101,3 +87,5 @@ export default function AppSidebar() {
     </aside>
   );
 }
+
+    

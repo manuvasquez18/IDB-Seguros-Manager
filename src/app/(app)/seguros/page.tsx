@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye, Search } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -125,34 +125,39 @@ export default function SegurosPage() {
   return (
     <>
       <Card>
-          <CardHeader>
-            <CardTitle>Búsqueda de pacientes dados de alta</CardTitle>
-             <div className="flex items-center gap-4">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Seguros</CardTitle>
+              <CardDescription>
+                Administra las pólizas de seguro de tus clientes.
+              </CardDescription>
+            </div>
+             <div className="flex items-center gap-2">
                <Input
                   type="search"
-                  placeholder="Buscar por nombre, cédula, nombre del médico"
-                  className="w-full appearance-none bg-background shadow-none"
+                  placeholder="Buscar por nombre, RIF..."
+                  className="w-full max-w-sm appearance-none bg-background shadow-none"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Button>
-                  <Search className="mr-2 h-4 w-4" />
-                  Buscar
-                </Button>
+                {canCreate && (
+                    <Button onClick={handleAdd}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Añadir Seguro
+                    </Button>
+                )}
             </div>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow className="bg-primary hover:bg-primary/90">
-                  <TableHead className="text-primary-foreground">Nº Historia</TableHead>
-                  <TableHead className="text-primary-foreground hidden md:table-cell">Cédula</TableHead>
-                  <TableHead className="text-primary-foreground hidden lg:table-cell">Apellidos y Nombres</TableHead>
-                  <TableHead className="text-primary-foreground">Ubicación</TableHead>
-                  <TableHead className="text-primary-foreground">Pendientes</TableHead>
-                  <TableHead className="text-primary-foreground">Médico tratante</TableHead>
-                  <TableHead className="text-primary-foreground">Fecha de admisión</TableHead>
-                  <TableHead className="text-primary-foreground">
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead className="hidden md:table-cell">Contacto</TableHead>
+                  <TableHead className="hidden lg:table-cell">RIF</TableHead>
+                  <TableHead>Estatus</TableHead>
+                  <TableHead className="hidden md:table-cell">Última Actualización</TableHead>
+                  <TableHead>
                     <span className="sr-only">Acciones</span>
                   </TableHead>
                 </TableRow>
@@ -160,20 +165,18 @@ export default function SegurosPage() {
               <TableBody>
                 {filteredSeguros && filteredSeguros.length > 0 ? (
                   filteredSeguros.map((seguro) => (
-                    <TableRow key={seguro.id} className="cursor-pointer" onClick={() => handleViewDetails(seguro)}>
-                      <TableCell className="font-medium">{seguro.id.substring(0,6)}</TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.rif}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{seguro.nombre}</TableCell>
+                    <TableRow key={seguro.id}>
+                      <TableCell className="font-medium">{seguro.nombre}</TableCell>
+                      <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
                       <TableCell>
                          <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
                           {seguro.estatus}
                         </Badge>
                       </TableCell>
-                      <TableCell>Pendiente</TableCell>
-                      <TableCell>{seguro.contacto}</TableCell>
-                      <TableCell>{seguro.created_at ? new Date(seguro.created_at).toLocaleDateString() : ''}</TableCell>
+                      <TableCell className="hidden md:table-cell">{seguro.updated_at ? new Date(seguro.updated_at).toLocaleDateString() : ''}</TableCell>
                       
-                        <TableCell onClick={(e) => e.stopPropagation()}>
+                        <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -193,7 +196,7 @@ export default function SegurosPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center h-24">
+                    <TableCell colSpan={6} className="text-center h-24">
                       {searchTerm ? 'No se encontraron seguros con ese criterio.' : 'No se encontraron seguros.'}
                     </TableCell>
                   </TableRow>
@@ -217,7 +220,7 @@ export default function SegurosPage() {
             <AlertDialogDescription>
               Esta acción no se puede deshacer. Esto eliminará permanentemente el
               seguro de nuestros servidores.
-            </AlertDialogDescription>
+            </dl>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -228,3 +231,5 @@ export default function SegurosPage() {
     </>
   );
 }
+
+    
