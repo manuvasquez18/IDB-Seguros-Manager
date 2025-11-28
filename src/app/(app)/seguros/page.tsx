@@ -36,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useCollection, useUser, useFirestore, useMemoFirebase } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 import type { Seguro } from "@/lib/definitions";
 import { SeguroSheet } from "@/components/seguros/seguro-sheet";
@@ -44,7 +44,6 @@ import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 
 export default function SegurosPage() {
-  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -53,9 +52,10 @@ export default function SegurosPage() {
   const [seguroToDelete, setSeguroToDelete] = useState<Seguro | null>(null);
 
   const segurosQuery = useMemoFirebase(() => {
-    if (!firestore || !user?.uid) return null;
-    return collection(firestore, `users/${user.uid}/seguros`);
-  }, [firestore, user?.uid]);
+    if (!firestore) return null;
+    // Query the root 'seguros' collection
+    return collection(firestore, 'seguros');
+  }, [firestore]);
 
   const { data: seguros, isLoading } = useCollection<Seguro>(segurosQuery);
 
@@ -75,14 +75,15 @@ export default function SegurosPage() {
   };
 
   const handleDelete = () => {
-    if (!firestore || !user?.uid || !seguroToDelete) return;
-    const docRef = doc(firestore, `users/${user.uid}/seguros`, seguroToDelete.id);
+    if (!firestore || !seguroToDelete) return;
+    // Reference the document in the root 'seguros' collection
+    const docRef = doc(firestore, `seguros`, seguroToDelete.id);
     deleteDocumentNonBlocking(docRef);
     setDeleteDialogOpen(false);
     setSeguroToDelete(null);
   };
   
-  if (isLoading || isUserLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <p>Cargando seguros...</p>

@@ -1,13 +1,5 @@
-/**
- * Core Philosophy: This ruleset enforces a strict user-ownership model. All data is considered private and can only be accessed by the user who created it.
- * Data Structure: Data is organized hierarchically under the `/users/{userId}` collection. Each user's data, including insurance policies (`seguros`) and their related sub-collections (contacts, files, etc.), is isolated within their own document tree. This path-based segregation is the primary mechanism for authorization.
- * Key Security Decisions:
- * - Default Deny: Access is denied by default. All operations require the request to come from an authenticated user who is the owner of the data path.
- * - No User Listing: It is impossible to list documents in the top-level `/users` collection to protect user privacy and prevent data scraping.
- * - Path-Based Authorization: Ownership is determined by matching the `userId` in the document path with the authenticated user's UID (`request.auth.uid`). This is highly performant as it avoids extra database reads.
- * - Relational Integrity: On document creation, rules validate that parent IDs (e.g., `seguroId`) in the document data match the corresponding ID from the path. This ensures data consistency within a user's data tree. These critical relational fields are immutable after creation.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -15,209 +7,57 @@ service cloud.firestore {
     // Helper Functions
     // ------------------------------------------------------------------------
 
-    /**
-     * Checks if the user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the authenticated user's UID matches the provided userId from the path.
-     * This is the core function for enforcing the user-ownership model.
-     * @param userId The user ID from the document path (e.g., from /users/{userId}).
-     */
+    // Function to get the user's role from their profile document
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.rol;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole(request.auth.uid) == 'admin';
+    }
+
+    function isSupervisor() {
+      return isSignedIn() && getUserRole(request.auth.uid) == 'supervisor';
+    }
+
+    function isUsuario() {
+        return isSignedIn() && getUserRole(request.auth.uid) == 'usuario';
+    }
+    
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-
-    /**
-     * For update/delete operations, checks ownership AND that the document already exists.
-     * Prevents modifying or deleting a document that doesn't exist.
-     * @param userId The user ID from the document path.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
-
-    /**
-     * Validates the UsuarioPortal document on creation.
-     * Ensures the document's internal `id` field matches the user's UID.
-     * @param userId The user ID from the document path.
-     */
-    function validatesUserDataOnCreate(userId) {
-      return request.resource.data.id == userId;
-    }
-
-    /**
-     * Ensures the internal `id` of a UsuarioPortal document is immutable.
-     */
-    function isUserDataImmutable() {
-      return request.resource.data.id == resource.data.id;
-    }
-
-    /**
-     * Validates a 'Seguro' document on creation.
-     * Enforces that the document's internal 'id' matches the document ID from the path.
-     * @param seguroId The document ID from the path.
-     */
-    function validatesSeguroDataOnCreate(seguroId) {
-      return request.resource.data.id == seguroId;
-    }
-
-    /**
-     * Ensures the internal `id` of a 'Seguro' document is immutable.
-     */
-    function isSeguroDataImmutable() {
-      return request.resource.data.id == resource.data.id;
-    }
-
-    /**
-     * Validates subcollection documents (e.g., Colectivo, Contacto) on creation.
-     * Enforces consistency between the path IDs (`seguroId`, `docId`) and the
-     * corresponding fields (`seguroId`, `id`) in the document's data.
-     * @param seguroId The parent insurance ID from the path.
-     * @param docId The ID of the document being created.
-     */
-    function validatesSubcollectionDataOnCreate(seguroId, docId) {
-      return request.resource.data.id == docId && request.resource.data.seguroId == seguroId;
-    }
-
-    /**
-     * Ensures critical relational IDs (`id`, `seguroId`) in subcollection
-     * documents are immutable after creation.
-     */
-    function isSubcollectionDataImmutable() {
-      return request.resource.data.id == resource.data.id
-          && request.resource.data.seguroId == resource.data.seguroId;
-    }
-
 
     // ------------------------------------------------------------------------
     // Collection Rules
     // ------------------------------------------------------------------------
 
-    /**
-     * @description Manages user profile documents.
-     * @path /users/{userId}
-     * @allow (create) An authenticated user can create their own user profile document. auth.uid must match {userId}.
-     * @allow (get, update, delete) The user who owns the profile can read, update, or delete it.
-     * @deny (list) Listing all users is strictly forbidden to protect user privacy.
-     * @deny (any) An authenticated user cannot access another user's profile document.
-     * @principle Restricts access to a user's own data tree and allows self-creation of a profile.
-     */
+    // Users can create their own profile, admins can manage any profile.
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isOwner(userId) && validatesUserDataOnCreate(userId);
-      allow update: if isExistingOwner(userId) && isUserDataImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
     }
 
-    /**
-     * @description Manages insurance policies (`seguros`) owned by a user.
-     * @path /users/{userId}/seguros/{seguroId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage their own insurance policies.
-     * @deny (any) A user cannot access another user's insurance policies.
-     * @principle Enforces strict data ownership for all operations within a user's private data subcollection.
-     */
-    match /users/{userId}/seguros/{seguroId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSeguroDataOnCreate(seguroId);
-      allow update: if isExistingOwner(userId) && isSeguroDataImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages groups (`colectivos`) associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/colectivos/{colectivoId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the colectivos for their seguros.
-     * @deny (any) A user cannot access colectivos belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path and validates relational integrity.
-     */
-    match /users/{userId}/seguros/{seguroId}/colectivos/{colectivoId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSubcollectionDataOnCreate(seguroId, colectivoId);
-      allow update: if isExistingOwner(userId) && isSubcollectionDataImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages contacts (`contactos`) associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/contactos/{contactoId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the contacts for their seguros.
-     * @deny (any) A user cannot access contacts belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path.
-     */
-    match /users/{userId}/seguros/{seguroId}/contactos/{contactoId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      // The Contacto entity schema does not include seguroId, so we only validate its own id.
-      allow create: if isOwner(userId) && request.resource.data.id == contactoId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages emails (`correos`) associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/correos/{correoId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the emails for their seguros.
-     * @deny (any) A user cannot access emails belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path and validates relational integrity.
-     */
-    match /users/{userId}/seguros/{seguroId}/correos/{correoId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSubcollectionDataOnCreate(seguroId, correoId);
-      allow update: if isExistingOwner(userId) && isSubcollectionDataImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages files (`archivos`) associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/archivos/{archivoId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the files for their seguros.
-     * @deny (any) A user cannot access files belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path and validates relational integrity.
-     */
-    match /users/{userId}/seguros/{seguroId}/archivos/{archivoId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSubcollectionDataOnCreate(seguroId, archivoId);
-      allow update: if isExistingOwner(userId) && isSubcollectionDataImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages logos associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/logos/{logoId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the logos for their seguros.
-     * @deny (any) A user cannot access logos belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path and validates relational integrity.
-     */
-    match /users/{userId}/seguros/{seguroId}/logos/{logoId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSubcollectionDataOnCreate(seguroId, logoId);
-      allow update: if isExistingOwner(userId) && isSubcollectionDataImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Manages popups associated with an insurance policy.
-     * @path /users/{userId}/seguros/{seguroId}/popups/{popupId}
-     * @allow (create, get, list, update, delete) The owner of the user path can fully manage the popups for their seguros.
-     * @deny (any) A user cannot access popups belonging to another user's insurance policy.
-     * @principle Enforces inherited ownership from the top-level user path and validates relational integrity.
-     */
-    match /users/{userId}/seguros/{seguroId}/popups/{popupId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && validatesSubcollectionDataOnCreate(seguroId, popupId);
-      allow update: if isExistingOwner(userId) && isSubcollectionDataImmutable();
-      allow delete: if isExistingOwner(userId);
+    // Rules for the root 'seguros' collection and its subcollections
+    match /seguros/{seguroId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() || isSupervisor();
+      allow update: if isAdmin() || isSupervisor();
+      allow delete: if isAdmin();
+      
+      // Apply same rules to all subcollections of a seguro
+      match /{allSubcollections}/{docId} {
+        allow read: if isSignedIn();
+        allow create: if isAdmin() || isSupervisor();
+        allow update: if isAdmin() || isSupervisor();
+        allow delete: if isAdmin();
+      }
     }
   }
 }

@@ -42,8 +42,13 @@ export default function RegisterPage() {
         const userRef = doc(firestore, `users/${user.uid}`);
         setDocumentNonBlocking(userRef, {
             id: user.uid,
-            nombreUsuario: user.displayName || user.email?.split('@')[0],
+            // Combine first and last name from form, or use email as fallback
+            nombre: (document.getElementById('first-name') as HTMLInputElement)?.value + ' ' + (document.getElementById('last-name') as HTMLInputElement)?.value || user.email?.split('@')[0],
             email: user.email,
+            rol: 'usuario', // Default role for new users
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         }, { merge: true });
         
         router.push("/seguros");

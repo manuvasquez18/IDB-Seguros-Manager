@@ -2,14 +2,14 @@
   "entities": {
     "UserProfile": {
       "title": "User Profile",
-      "description": "Stores user profile information, mirroring the user_profile SQL table.",
+      "description": "Stores user profile information.",
       "type": "object",
       "properties": {
         "id": { "type": "string", "description": "User's unique ID, matches Firebase Auth UID." },
         "nombre": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "telefono": { "type": "string" },
-        "rol": { "type": "string", "enum": ["admin", "coordinador", "usuario"] },
+        "rol": { "type": "string", "enum": ["admin", "supervisor", "usuario"] },
         "avatar_url": { "type": "string", "format": "uri" },
         "is_active": { "type": "boolean", "default": true },
         "last_login": { "type": "string", "format": "date-time" },
@@ -20,7 +20,7 @@
     },
     "Seguro": {
       "title": "Seguro",
-      "description": "Represents an insurance policy, based on the 'seguro' SQL table.",
+      "description": "Represents an insurance policy.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -139,80 +139,61 @@
   },
   "auth": { "providers": ["password", "anonymous"] },
   "firestore": {
-     "structure": [
+    "structure": [
       {
         "path": "/users/{userId}",
         "definition": {
-          "entityName": "UserProfile",
-          "schema": { "$ref": "#/backend/entities/UserProfile" },
-          "description": "Collection for storing user-specific data. This allows path-based ownership for access control.",
-          "params": [{"name": "userId", "description": "The unique identifier for the user."}]
+          "schema": { "$ref": "#/entities/UserProfile" },
+          "description": "Stores user profile information and roles."
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}",
+        "path": "/seguros/{seguroId}",
         "definition": {
-          "entityName": "Seguro",
-          "schema": { "$ref": "#/backend/entities/Seguro" },
-          "description": "Collection for storing insurance policies owned by a specific user.",
-          "params": [
-            {"name": "userId", "description": "The user ID."},
-            {"name": "seguroId", "description": "The insurance policy ID."}
-          ]
+          "schema": { "$ref": "#/entities/Seguro" },
+          "description": "Root collection for all insurance policies."
         }
       },
       {
         "path": "/seguros/{seguroId}/colectivos/{colectivoId}",
         "definition": {
-          "entityName": "Colectivo",
-          "schema": { "$ref": "#/backend/entities/Colectivo" },
-          "description": "Subcollection for groups in an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "colectivoId"}]
+          "schema": { "$ref": "#/entities/Colectivo" },
+          "description": "Subcollection for groups in an insurance policy."
         }
       },
       {
         "path": "/seguros/{seguroId}/contactos/{contactoId}",
         "definition": {
-          "entityName": "Contacto",
-          "schema": { "$ref": "#/backend/entities/Contacto" },
-          "description": "Subcollection for contacts in an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "contactoId"}]
+          "schema": { "$ref": "#/entities/Contacto" },
+          "description": "Subcollection for contacts in an insurance policy."
         }
       },
       {
         "path": "/seguros/{seguroId}/correos/{correoId}",
         "definition": {
-          "entityName": "Correo",
-          "schema": { "$ref": "#/backend/entities/Correo" },
-          "description": "Subcollection for emails in an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "correoId"}]
+          "schema": { "$ref": "#/entities/Correo" },
+          "description": "Subcollection for emails in an insurance policy."
         }
       },
       {
         "path": "/seguros/{seguroId}/usuarios_portal/{usuarioPortalId}",
         "definition": {
-          "entityName": "UsuarioPortal",
-          "schema": { "$ref": "#/backend/entities/UsuarioPortal" },
-          "description": "Subcollection for portal users of an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "usuarioPortalId"}]
+          "schema": { "$ref": "#/entities/UsuarioPortal" },
+          "description": "Subcollection for portal users of an insurance policy."
         }
       },
       {
         "path": "/seguros/{seguroId}/popups/{popupId}",
         "definition": {
-          "entityName": "Popup",
-          "schema": { "$ref": "#/backend/entities/Popup" },
-          "description": "Subcollection for popups in an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "popupId"}]
+          "schema": { "$ref": "#/entities/Popup" },
+          "description": "Subcollection for popups in an insurance policy."
         }
       },
       {
         "path": "/seguros/{seguroId}/archivos/{archivoId}",
         "definition": {
-          "entityName": "Archivo",
-          "schema": { "$ref": "#/backend/entities/Archivo" },
-          "description": "Subcollection for files in an insurance policy.",
-          "params": [{"name": "seguroId"}, {"name": "archivoId"}]
+          "schema": { "$ref": "#/entities/Archivo" },
+          "description": "Subcollection for files in an insurance policy."
         }
       }
     ]

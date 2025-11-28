@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { SeguroForm, type SeguroFormValues } from "./seguro-form";
 import type { Seguro } from "@/lib/definitions";
-import { useUser, useFirestore } from "@/firebase";
+import { useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { v4 as uuidv4 } from 'uuid';
@@ -23,16 +23,16 @@ interface SeguroSheetProps {
 }
 
 export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
-  const { user } = useUser();
   const firestore = useFirestore();
 
   const isEditMode = !!seguro;
 
   const handleSubmit = (data: SeguroFormValues) => {
-    if (!firestore || !user?.uid) return;
+    if (!firestore) return;
     
     const seguroId = isEditMode ? seguro.id : uuidv4();
-    const docRef = doc(firestore, `users/${user.uid}/seguros`, seguroId);
+    // Reference the document in the root 'seguros' collection
+    const docRef = doc(firestore, `seguros`, seguroId);
 
     const dataToSave: Seguro = {
       ...data,
