@@ -21,7 +21,9 @@ export function NotificationBell() {
   const { user } = useUser();
 
   const notificationsQuery = useMemoFirebase(() => {
+    // Only run the query if the user is authenticated
     if (!firestore || !user) return null;
+    
     // Query the 'notificaciones' collection group
     return query(
       collectionGroup(firestore, 'notificaciones'), 
@@ -30,12 +32,13 @@ export function NotificationBell() {
     );
   }, [firestore, user]);
 
+  // The hook will now wait until the query is not null
   const { data: notifications, isLoading } = useCollection<Notificacion>(notificationsQuery);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full relative">
+        <Button variant="secondary" size="icon" className="rounded-full relative">
           <Bell className="h-5 w-5" />
           {notifications && notifications.length > 0 && (
              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
