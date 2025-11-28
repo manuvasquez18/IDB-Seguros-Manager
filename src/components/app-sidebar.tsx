@@ -28,6 +28,7 @@ export default function AppSidebar() {
 
 
   const handleLogout = () => {
+    if(!auth) return;
     auth.signOut().then(() => {
       router.push('/login');
     });
@@ -39,67 +40,48 @@ export default function AppSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex bg-[--sidebar-background] text-[--sidebar-foreground]">
-      <TooltipProvider>
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <Link
-            href="#"
-            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-          >
-             <Image 
-              src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
-              alt="IDB Previmédica Logo"
-              width={36}
-              height={36}
-              className="h-9 w-9 transition-all group-hover:scale-110"
-            />
-            <span className="sr-only">IDB Seguros</span>
-          </Link>
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-background sm:flex bg-[--sidebar-background] text-[--sidebar-foreground]">
+        <nav className="flex flex-col gap-2 p-4">
+          <div className="flex h-16 items-center justify-center px-6 mb-4">
+             <Link href="/seguros">
+                 <Image 
+                  src="https://citasprevimedicaidb.com/sia/assets/img/Logos-en-Vectores-DIAPO.png"
+                  alt="IDB Previmédica Logo"
+                  width={200}
+                  height={50}
+                />
+             </Link>
+          </div>
 
           {menuItems.map((item) => (
             userCanView(item.roles) && (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={item.href}
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${pathname.startsWith(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
-              </Tooltip>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${pathname.startsWith(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.label}</span>
+              </Link>
             )
           ))}
         </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-           <Tooltip>
-            <TooltipTrigger asChild>
+        <nav className="mt-auto flex flex-col gap-2 p-4">
               <Link
                 href="/settings"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${pathname === '/settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 <Settings className="h-5 w-5" />
-                <span className="sr-only">Settings</span>
+                 <span>Configuración</span>
               </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Settings</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
               <button
                 onClick={handleLogout}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground"
               >
                 <LogOut className="h-5 w-5" />
-                <span className="sr-only">Cerrar Sesión</span>
+                <span>Cerrar Sesión</span>
               </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Cerrar Sesión</TooltipContent>
-          </Tooltip>
         </nav>
-      </TooltipProvider>
     </aside>
   );
 }
