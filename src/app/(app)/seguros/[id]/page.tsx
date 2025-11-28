@@ -11,13 +11,12 @@ import { ArrowLeft } from 'lucide-react';
 import { SeguroInfoTab } from '@/components/seguros/details/SeguroInfoTab';
 import { ColectivosTab } from '@/components/seguros/details/ColectivosTab';
 import { ContactosTab } from '@/components/seguros/details/ContactosTab';
-import { CorreosTab } from '@/components/seguros/details/CorreosTab';
 import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 import { SeguroSheet } from '@/components/seguros/seguro-sheet';
 import { useUserProfile } from '@/hooks/use-user-profile';
 
-type TabValue = 'info' | 'colectivos' | 'contactos_correos' | 'usuarios_portal' | 'archivos';
+type TabValue = 'info' | 'colectivos' | 'contactos' | 'usuarios_portal' | 'archivos';
 
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
@@ -94,7 +93,7 @@ export default function SeguroDetailPage() {
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="info">Información General</TabsTrigger>
             <TabsTrigger value="colectivos">Colectivos</TabsTrigger>
-            <TabsTrigger value="contactos_correos">Contactos y Correos</TabsTrigger>
+            <TabsTrigger value="contactos">Contactos</TabsTrigger>
             <TabsTrigger value="usuarios_portal">Usuarios Portal</TabsTrigger>
             <TabsTrigger value="archivos">Archivos</TabsTrigger>
           </TabsList>
@@ -105,13 +104,8 @@ export default function SeguroDetailPage() {
           <TabsContent value="colectivos" forceMount={activeTab !== 'colectivos'}>
             {activeTab === 'colectivos' && <ColectivosTab seguroId={seguro.id} isActive={true} />}
           </TabsContent>
-          <TabsContent value="contactos_correos" className="space-y-6" forceMount={activeTab !== 'contactos_correos'}>
-            {activeTab === 'contactos_correos' && (
-              <>
-                <ContactosTab seguroId={seguro.id} isActive={true} />
-                <CorreosTab seguroId={seguro.id} isActive={true} />
-              </>
-            )}
+          <TabsContent value="contactos" forceMount={activeTab !== 'contactos'}>
+            {activeTab === 'contactos' && <ContactosTab seguroId={seguro.id} isActive={true} />}
           </TabsContent>
           <TabsContent value="usuarios_portal" forceMount={activeTab !== 'usuarios_portal'}>
             {activeTab === 'usuarios_portal' && <UsuariosPortalTab seguroId={seguro.id} isActive={true} />}

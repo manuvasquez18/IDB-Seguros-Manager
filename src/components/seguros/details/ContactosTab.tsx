@@ -19,6 +19,7 @@ interface ContactosTabProps {
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio."),
   telefono: z.string().optional(),
+  correo: z.string().email("Debe ser un correo electrónico válido.").optional().or(z.literal('')),
   comentario: z.string().optional(),
 });
 
@@ -27,6 +28,7 @@ type FormValues = z.infer<typeof formSchema>;
 const formFields = [
   { name: 'nombre' as const, label: 'Nombre del Contacto', type: 'text' as const, placeholder: 'Ej: Juan Pérez' },
   { name: 'telefono' as const, label: 'Teléfono', type: 'text' as const, placeholder: 'Ej: +58 414-1234567' },
+  { name: 'correo' as const, label: 'Correo Electrónico', type: 'email' as const, placeholder: 'ejemplo@seguro.com' },
   { name: 'comentario' as const, label: 'Comentario', type: 'textarea' as const, placeholder: 'Notas adicionales sobre el contacto' },
 ];
 
@@ -63,7 +65,8 @@ export function ContactosTab({ seguroId, isActive }: ContactosTabProps) {
   
   const tableColumns = [
     { key: 'nombre' as const, header: 'Nombre' },
-    { key: 'telefono' as const, header: 'Teléfono', className: 'hidden md:table-cell' },
+    { key: 'telefono' as const, header: 'Teléfono', className: 'hidden sm:table-cell' },
+    { key: 'correo' as const, header: 'Correo', className: 'hidden md:table-cell' },
     { key: 'comentario' as const, header: 'Comentario', className: 'hidden lg:table-cell' },
   ];
 

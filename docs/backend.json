@@ -73,25 +73,12 @@
         "seguro_id": { "type": "string" },
         "nombre": { "type": "string" },
         "telefono": { "type": "string" },
-        "comentario": { "type": "string" },
-        "created_at": { "type": "string", "format": "date-time" },
-        "updated_at": { "type": "string", "format": "date-time" }
-      },
-      "required": ["id", "seguro_id", "nombre"]
-    },
-    "Correo": {
-      "title": "Correo",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "seguro_id": { "type": "string" },
-        "nombre": { "type": "string" },
         "correo": { "type": "string", "format": "email" },
         "comentario": { "type": "string" },
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "seguro_id", "nombre", "correo"]
+      "required": ["id", "seguro_id", "nombre"]
     },
     "UsuarioPortal": {
       "title": "Usuario de Portal",
@@ -169,13 +156,6 @@
         "definition": {
           "schema": { "$ref": "#/entities/Contacto" },
           "description": "Subcollection for contacts in an insurance policy."
-        }
-      },
-      {
-        "path": "/seguros/{seguroId}/correos/{correoId}",
-        "definition": {
-          "schema": { "$ref": "#/entities/Correo" },
-          "description": "Subcollection for emails in an insurance policy."
         }
       },
       {

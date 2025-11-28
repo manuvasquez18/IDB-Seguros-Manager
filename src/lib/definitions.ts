@@ -54,16 +54,7 @@ export type Contacto = {
     seguro_id: string;
     nombre: string;
     telefono?: string;
-    comentario?: string;
-    created_at?: string;
-    updated_at?: string;
-};
-
-export type Correo = {
-    id: string;
-    seguro_id: string;
-    nombre: string;
-    correo: string;
+    correo?: string;
     comentario?: string;
     created_at?: string;
     updated_at?: string;
