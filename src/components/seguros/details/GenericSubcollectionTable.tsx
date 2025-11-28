@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Edit, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { doc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
@@ -80,7 +79,7 @@ export function GenericSubcollectionTable<T extends ItemWithId>({
             {columns.map(col => (
               <TableHead key={col.key as string} className={col.className}>{col.header}</TableHead>
             ))}
-            {showActionsColumn && <TableHead><span className="sr-only">Acciones</span></TableHead>}
+            {showActionsColumn && <TableHead className="text-right">Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -93,20 +92,9 @@ export function GenericSubcollectionTable<T extends ItemWithId>({
                   </TableCell>
                 ))}
                 {showActionsColumn && (
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        {onEdit && <DropdownMenuItem onSelect={() => onEdit(item)}><Edit className="mr-2"/>Editar</DropdownMenuItem>}
-                        {onDelete && <DropdownMenuItem onSelect={() => openDeleteDialog(item)} className="text-destructive"><Trash2 className="mr-2"/>Eliminar</DropdownMenuItem>}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="text-right space-x-2">
+                    {onEdit && <Button variant="outline" size="icon" onClick={() => onEdit(item)}><Edit className="h-4 w-4" /></Button>}
+                    {onDelete && <Button variant="destructive" size="icon" onClick={() => openDeleteDialog(item)}><Trash2 className="h-4 w-4" /></Button>}
                   </TableCell>
                 )}
               </TableRow>
