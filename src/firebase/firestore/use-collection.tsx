@@ -99,6 +99,16 @@ export function useCollection<T = any>(
           console.error("Could not determine path for Firestore permission error:", e);
         }
 
+        // CRITICAL: Prevent emitting errors for invalid root paths.
+        if (path === '/' || path === '' || path === 'unknown/path') {
+            console.error(`useCollection: Invalid path ('${path}') detected for permission error. This indicates a query was likely null or malformed.`);
+            const safeError = new Error('Firestore query was malformed or path could not be determined.');
+            setError(safeError);
+            setData(null);
+            setIsLoading(false);
+            return; // Do not proceed to emit a contextual error for an invalid path
+        }
+        
         const contextualError = new FirestorePermissionError({
           operation: 'list',
           path,
