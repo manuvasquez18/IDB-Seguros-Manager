@@ -7,9 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  SheetFooter,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 import { SeguroForm, type SeguroFormValues } from "./seguro-form";
 import type { Seguro } from "@/lib/definitions";
 import { useUser, useFirestore } from "@/firebase";
@@ -36,9 +34,13 @@ export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
     const seguroId = isEditMode ? seguro.id : uuidv4();
     const docRef = doc(firestore, `users/${user.uid}/seguros`, seguroId);
 
-    const dataToSave = {
-        ...data,
-        id: seguroId,
+    const dataToSave: Seguro = {
+      ...data,
+      id: seguroId,
+      nombre: data.nombre,
+      estatus: data.estatus,
+      updated_at: new Date().toISOString(),
+      ...(isEditMode ? {} : { created_at: new Date().toISOString() }),
     };
     
     setDocumentNonBlocking(docRef, dataToSave, { merge: isEditMode });
@@ -47,7 +49,7 @@ export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-3xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{isEditMode ? "Editar Seguro" : "Añadir Nuevo Seguro"}</SheetTitle>
           <SheetDescription>

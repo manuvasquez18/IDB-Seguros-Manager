@@ -1,455 +1,220 @@
 {
   "entities": {
-    "Seguro": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Seguro",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user profile information, mirroring the user_profile SQL table.",
       "type": "object",
-      "description": "Represents an insurance policy.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Seguro entity."
-        },
-        "contactoId": {
-          "type": "string",
-          "description": "Reference to Contacto. (Relationship: Contacto 1:N Seguro)"
-        },
-        "moneda": {
-          "type": "string",
-          "description": "Currency of the insurance policy."
-        },
-        "rif": {
-          "type": "string",
-          "description": "RIF (Tax Identification Number) associated with the insurance."
-        },
-        "cobertura": {
-          "type": "string",
-          "description": "Coverage details of the insurance policy."
-        },
-        "otrosDetalles": {
-          "type": "string",
-          "description": "Other relevant details of the insurance policy."
-        }
+        "id": { "type": "string", "description": "User's unique ID, matches Firebase Auth UID." },
+        "nombre": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "telefono": { "type": "string" },
+        "rol": { "type": "string", "enum": ["admin", "coordinador", "usuario"] },
+        "avatar_url": { "type": "string", "format": "uri" },
+        "is_active": { "type": "boolean", "default": true },
+        "last_login": { "type": "string", "format": "date-time" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "contactoId",
-        "moneda",
-        "rif",
-        "cobertura"
-      ]
+      "required": ["id", "nombre", "email", "rol", "is_active"]
+    },
+    "Seguro": {
+      "title": "Seguro",
+      "description": "Represents an insurance policy, based on the 'seguro' SQL table.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "contacto": { "type": "string" },
+        "moneda": { "type": "string" },
+        "rif": { "type": "string" },
+        "cobertura": { "type": "string" },
+        "plazo_pago": { "type": "string" },
+        "direccion": { "type": "string" },
+        "forma_pago": { "type": "string" },
+        "tipo_precio": { "type": "string" },
+        "estatus": { "type": "string", "enum": ["Activo", "Suspendido"] },
+        "baremo": { "type": "string" },
+        "portal_web": { "type": "string", "format": "uri" },
+        "fact_a_nombre": { "type": "string" },
+        "fact_formato": { "type": "string" },
+        "fact_comentario": { "type": "string" },
+        "cons_protocolo": { "type": "string" },
+        "cons_modalidad": { "type": "string" },
+        "cons_copiar_a": { "type": "string" },
+        "cons_horario": { "type": "string" },
+        "cons_documentos": { "type": "string" },
+        "cons_comentario": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "nombre", "estatus"]
     },
     "Colectivo": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Colectivo",
       "type": "object",
-      "description": "Represents a group associated with an insurance policy.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Colectivo entity."
-        },
-        "seguroId": {
-          "type": "string",
-          "description": "Reference to Seguro. (Relationship: Seguro 1:N Colectivo)"
-        },
-        "nombre": {
-          "type": "string",
-          "description": "Name of the colectivo."
-        },
-        "descripcion": {
-          "type": "string",
-          "description": "Description of the colectivo."
-        }
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "seguroId",
-        "nombre",
-        "descripcion"
-      ]
+      "required": ["id", "seguro_id", "nombre"]
     },
     "Contacto": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Contacto",
       "type": "object",
-      "description": "Represents a contact related to an insurance policy.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Contacto entity."
-        },
-        "nombre": {
-          "type": "string",
-          "description": "Name of the contact."
-        },
-        "telefono": {
-          "type": "string",
-          "description": "Phone number of the contact."
-        },
-        "comentarios": {
-          "type": "string",
-          "description": "Comments related to the contact."
-        }
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "telefono": { "type": "string" },
+        "comentario": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "nombre",
-        "telefono"
-      ]
+      "required": ["id", "seguro_id", "nombre"]
     },
     "Correo": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Correo",
       "type": "object",
-      "description": "Represents an email associated with an insurance policy.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Correo entity."
-        },
-        "seguroId": {
-          "type": "string",
-          "description": "Reference to Seguro. (Relationship: Seguro 1:N Correo)"
-        },
-        "nombre": {
-          "type": "string",
-          "description": "Name of the email."
-        },
-        "direccionEmail": {
-          "type": "string",
-          "description": "Email address."
-        },
-        "comentarios": {
-          "type": "string",
-          "description": "Comments related to the email."
-        }
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "correo": { "type": "string", "format": "email" },
+        "comentario": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "seguroId",
-        "nombre",
-        "direccionEmail"
-      ]
-    },
-    "Archivo": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Archivo",
-      "type": "object",
-      "description": "Represents a file associated with an insurance policy.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Archivo entity."
-        },
-        "seguroId": {
-          "type": "string",
-          "description": "Reference to Seguro. (Relationship: Seguro 1:N Archivo)"
-        },
-        "nombreArchivo": {
-          "type": "string",
-          "description": "Name of the file."
-        },
-        "urlAlmacenamiento": {
-          "type": "string",
-          "description": "URL where the file is stored."
-        }
-      },
-      "required": [
-        "id",
-        "seguroId",
-        "nombreArchivo",
-        "urlAlmacenamiento"
-      ]
+      "required": ["id", "seguro_id", "nombre", "correo"]
     },
     "UsuarioPortal": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UsuarioPortal",
+      "title": "Usuario de Portal",
       "type": "object",
-      "description": "Represents a user of the portal (assuming separate from authentication system).",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UsuarioPortal entity."
-        },
-        "nombreUsuario": {
-          "type": "string",
-          "description": "Username of the portal user."
-        },
-        "email": {
-          "type": "string",
-          "description": "Email address of the portal user.",
-          "format": "email"
-        }
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "usuario": { "type": "string" },
+        "password": { "type": "string" },
+        "comentario": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "nombreUsuario",
-        "email"
-      ]
-    },
-    "Logo": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Logo",
-      "type": "object",
-      "description": "Represents a logo associated with an insurance policy.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Logo entity."
-        },
-        "seguroId": {
-          "type": "string",
-          "description": "Reference to Seguro. (Relationship: Seguro 1:N Logo)"
-        },
-        "nombreArchivo": {
-          "type": "string",
-          "description": "Name of the file."
-        },
-        "urlAlmacenamiento": {
-          "type": "string",
-          "description": "URL where the file is stored."
-        }
-      },
-      "required": [
-        "id",
-        "seguroId",
-        "nombreArchivo",
-        "urlAlmacenamiento"
-      ]
+      "required": ["id", "seguro_id", "usuario", "password"]
     },
     "Popup": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Popup",
       "type": "object",
-      "description": "Represents a popup message or notification.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Popup entity."
-        },
-        "seguroId": {
-          "type": "string",
-          "description": "Reference to Seguro. (Relationship: Seguro 1:N Popup)"
-        },
-        "titulo": {
-          "type": "string",
-          "description": "Title of the popup."
-        },
-        "mensaje": {
-          "type": "string",
-          "description": "Message content of the popup."
-        },
-        "fechaInicio": {
-          "type": "string",
-          "description": "Start date for displaying the popup.",
-          "format": "date-time"
-        },
-        "fechaFin": {
-          "type": "string",
-          "description": "End date for displaying the popup.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "titulo": { "type": "string" },
+        "cuerpo": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "activo": { "type": "boolean" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "seguroId",
-        "titulo",
-        "mensaje",
-        "fechaInicio",
-        "fechaFin"
-      ]
+      "required": ["id", "seguro_id", "titulo", "activo"]
+    },
+    "Archivo": {
+      "title": "Archivo",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "seguro_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "url_storage": { "type": "string", "format": "uri" },
+        "tipo_mime": { "type": "string" },
+        "tamano_kb": { "type": "integer" },
+        "comentario": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "seguro_id", "nombre", "url_storage"]
     }
   },
-  "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
-  },
+  "auth": { "providers": ["password", "anonymous"] },
   "firestore": {
-    "structure": [
+     "structure": [
       {
         "path": "/users/{userId}",
         "definition": {
-          "entityName": "UsuarioPortal",
-          "schema": {
-            "$ref": "#/backend/entities/UsuarioPortal"
-          },
+          "entityName": "UserProfile",
+          "schema": { "$ref": "#/backend/entities/UserProfile" },
           "description": "Collection for storing user-specific data. This allows path-based ownership for access control.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user.  This is used to ensure only the user can access data stored under this path."
-            }
-          ]
+          "params": [{"name": "userId", "description": "The unique identifier for the user."}]
         }
       },
       {
         "path": "/users/{userId}/seguros/{seguroId}",
         "definition": {
           "entityName": "Seguro",
-          "schema": {
-            "$ref": "#/backend/entities/Seguro"
-          },
+          "schema": { "$ref": "#/backend/entities/Seguro" },
           "description": "Collection for storing insurance policies owned by a specific user.",
           "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy."
-            }
+            {"name": "userId", "description": "The user ID."},
+            {"name": "seguroId", "description": "The insurance policy ID."}
           ]
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}/colectivos/{colectivoId}",
+        "path": "/seguros/{seguroId}/colectivos/{colectivoId}",
         "definition": {
           "entityName": "Colectivo",
-          "schema": {
-            "$ref": "#/backend/entities/Colectivo"
-          },
-          "description": "Subcollection for storing groups associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and colectivo."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the colectivo."
-            },
-            {
-              "name": "colectivoId",
-              "description": "The unique identifier for the group."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Colectivo" },
+          "description": "Subcollection for groups in an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "colectivoId"}]
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}/contactos/{contactoId}",
+        "path": "/seguros/{seguroId}/contactos/{contactoId}",
         "definition": {
           "entityName": "Contacto",
-          "schema": {
-            "$ref": "#/backend/entities/Contacto"
-          },
-          "description": "Subcollection for storing contacts associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and contacto."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the contacto."
-            },
-            {
-              "name": "contactoId",
-              "description": "The unique identifier for the contact."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Contacto" },
+          "description": "Subcollection for contacts in an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "contactoId"}]
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}/correos/{correoId}",
+        "path": "/seguros/{seguroId}/correos/{correoId}",
         "definition": {
           "entityName": "Correo",
-          "schema": {
-            "$ref": "#/backend/entities/Correo"
-          },
-          "description": "Subcollection for storing emails associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and correo."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the email."
-            },
-            {
-              "name": "correoId",
-              "description": "The unique identifier for the email."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Correo" },
+          "description": "Subcollection for emails in an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "correoId"}]
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}/archivos/{archivoId}",
+        "path": "/seguros/{seguroId}/usuarios_portal/{usuarioPortalId}",
         "definition": {
-          "entityName": "Archivo",
-          "schema": {
-            "$ref": "#/backend/entities/Archivo"
-          },
-          "description": "Subcollection for storing files associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and archivo."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the file."
-            },
-            {
-              "name": "archivoId",
-              "description": "The unique identifier for the file."
-            }
-          ]
+          "entityName": "UsuarioPortal",
+          "schema": { "$ref": "#/backend/entities/UsuarioPortal" },
+          "description": "Subcollection for portal users of an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "usuarioPortalId"}]
         }
       },
       {
-        "path": "/users/{userId}/seguros/{seguroId}/logos/{logoId}",
-        "definition": {
-          "entityName": "Logo",
-          "schema": {
-            "$ref": "#/backend/entities/Logo"
-          },
-          "description": "Subcollection for storing logos associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and logo."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the logo."
-            },
-            {
-              "name": "logoId",
-              "description": "The unique identifier for the logo."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/seguros/{seguroId}/popups/{popupId}",
+        "path": "/seguros/{seguroId}/popups/{popupId}",
         "definition": {
           "entityName": "Popup",
-          "schema": {
-            "$ref": "#/backend/entities/Popup"
-          },
-          "description": "Subcollection for storing popups associated with a specific insurance policy, owned by a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the seguro and popup."
-            },
-            {
-              "name": "seguroId",
-              "description": "The unique identifier for the insurance policy associated with the popup."
-            },
-            {
-              "name": "popupId",
-              "description": "The unique identifier for the popup."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Popup" },
+          "description": "Subcollection for popups in an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "popupId"}]
+        }
+      },
+      {
+        "path": "/seguros/{seguroId}/archivos/{archivoId}",
+        "definition": {
+          "entityName": "Archivo",
+          "schema": { "$ref": "#/backend/entities/Archivo" },
+          "description": "Subcollection for files in an insurance policy.",
+          "params": [{"name": "seguroId"}, {"name": "archivoId"}]
         }
       }
-    ],
-    "reasoning": "The Firestore data structure is designed to manage seguros (insurance policies), colectivos (groups), contactos (contacts), correos (emails), archivos (files), usuariosPortal (portal users), logos, and popups, while adhering to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters).\n\n**Authorization Independence:**\nAuthorization independence is achieved via path-based ownership for private user data. Each user has their own top-level collection that stores all the seguros, colectivos, contactos, correos, archivos, logos and popups.\n\n**Structural Segregation:**\nSegregation is enforced as there is one collection per entity with similar security postures.\n\n**Access Modeling:**\nPrivate Data: Path-based ownership (`/users/{userId}/seguros/{seguroId}`).\n1:N relationships continue the path structure (e.g., `/users/{userId}/seguros/{seguroId}/colectivos/{colectivoId}`).\n\n**QAPs Support:**\nThe structure supports secure `list` operations. Each user's data is segregated under their own document, preventing unauthorized access to other users' data.  Rules can easily filter based on ownership (`request.auth.uid == userId`).  The path-based ownership model inherently allows for secure listing of entities, as a user can only list documents within their designated path.\n"
+    ]
   }
 }

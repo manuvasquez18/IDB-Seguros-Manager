@@ -117,13 +117,12 @@ export default function SegurosPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead>Nombre</TableHead>
                   <TableHead className="hidden md:table-cell">Contacto</TableHead>
-                  <TableHead className="hidden lg:table-cell">Moneda</TableHead>
-                  <TableHead className="hidden md:table-cell">RIF</TableHead>
-                  <TableHead>Estado</TableHead>
+                  <TableHead className="hidden lg:table-cell">RIF</TableHead>
+                  <TableHead>Estatus</TableHead>
                   <TableHead>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">Acciones</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -131,16 +130,12 @@ export default function SegurosPage() {
                 {seguros && seguros.length > 0 ? (
                   seguros.map((seguro) => (
                     <TableRow key={seguro.id}>
-                      <TableCell className="font-medium">{
-                        // show only first 8 characters of id
-                        seguro.id.substring(0, 8)
-                      }...</TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.contactoId}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{seguro.moneda}</TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.rif}</TableCell>
+                      <TableCell className="font-medium">{seguro.nombre}</TableCell>
+                      <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
                       <TableCell>
-                        <Badge variant={"outline"}>
-                          Activo
+                         <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
+                          {seguro.estatus}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -162,7 +157,7 @@ export default function SegurosPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">
+                    <TableCell colSpan={5} className="text-center">
                       No se encontraron seguros.
                     </TableCell>
                   </TableRow>
