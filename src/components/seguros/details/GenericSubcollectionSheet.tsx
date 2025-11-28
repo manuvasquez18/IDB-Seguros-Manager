@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -49,7 +49,7 @@ export function GenericSubcollectionSheet<T extends z.ZodObject<any, any, any>>(
   const firestore = useFirestore();
   const isEditMode = !!selectedItem;
 
-  const defaultValues = React.useMemo(() => {
+  const defaultValues = useMemo(() => {
     const initialValues: Record<string, any> = {};
     formFields.forEach(field => {
         if(field.type === 'switch') {
