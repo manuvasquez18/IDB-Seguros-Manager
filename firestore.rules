@@ -71,5 +71,10 @@ service cloud.firestore {
         allow delete: if isAdmin();
       }
     }
+    
+    // Allow collection group queries for notifications for any signed-in user.
+    match /{path=**}/notificaciones/{notificacionId} {
+      allow read: if isSignedIn();
+    }
   }
 }

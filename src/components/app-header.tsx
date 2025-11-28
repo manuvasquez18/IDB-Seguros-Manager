@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   SidebarTrigger,
@@ -16,9 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Bell, CircleUser } from "lucide-react";
+import { CircleUser } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { NotificationBell } from "./NotificationBell";
 
 export default function AppHeader() {
   const { user } = useUser();
@@ -27,9 +27,11 @@ export default function AppHeader() {
   const router = useRouter();
 
   const handleLogout = () => {
-    auth.signOut().then(() => {
-      router.push('/login');
-    });
+    if (auth) {
+        auth.signOut().then(() => {
+          router.push('/login');
+        });
+    }
   };
 
   return (
@@ -42,10 +44,7 @@ export default function AppHeader() {
         {/* Search bar removed from here */}
       </div>
 
-      <Button variant="ghost" size="icon" className="rounded-full">
-        <Bell className="h-5 w-5" />
-        <span className="sr-only">Toggle notifications</span>
-      </Button>
+      <NotificationBell />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -57,7 +56,7 @@ export default function AppHeader() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{profile?.nombre || user?.email || 'Mi Cuenta'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/settings">Configuración</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>Soporte</DropdownMenuItem>
