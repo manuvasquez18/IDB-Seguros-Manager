@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -52,7 +53,7 @@ export default function AppSidebar() {
           </div>
         <div className="flex flex-col gap-2 p-4">
           
-          <nav className="flex flex-col gap-2 px-2">
+          <nav className="flex flex-col gap-2">
             {menuItems.map((item) => (
               userCanView(item.roles) && (
                 <Link
@@ -79,3 +80,4 @@ export default function AppSidebar() {
     </aside>
   );
 }
+
