@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal, Search, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -117,41 +117,28 @@ export default function UsuariosPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-            <p className="text-muted-foreground">
-              Administra los usuarios y sus roles en el sistema.
-            </p>
-          </div>
-          {canCreate && (
-             <Button onClick={handleAddUser}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Crear Usuario
-            </Button>
-          )}
-        </div>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                  <CardTitle>Usuarios Registrados</CardTitle>
-                  <CardDescription>
-                  Una lista de todos los usuarios en el sistema.
-                  </CardDescription>
-              </div>
-              <div className="relative w-full max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Buscar por nombre, email..."
-                    className="w-full appearance-none bg-background pl-8 shadow-none"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
+      <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Gestión de Usuarios</CardTitle>
+              <CardDescription>
+                Administra los usuarios y sus roles en el sistema.
+              </CardDescription>
+            </div>
+             <div className="flex items-center gap-2">
+               <Input
+                  type="search"
+                  placeholder="Buscar por nombre, email..."
+                  className="w-full max-w-sm appearance-none bg-background shadow-none"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {canCreate && (
+                    <Button onClick={handleAddUser}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Crear Usuario
+                    </Button>
+                )}
             </div>
           </CardHeader>
           <CardContent>
@@ -233,7 +220,6 @@ export default function UsuariosPage() {
             </Table>
           </CardContent>
         </Card>
-      </div>
       {canCreate && (
         <UserSheet
             open={sheetOpen}
