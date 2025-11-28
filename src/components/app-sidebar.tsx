@@ -59,7 +59,7 @@ export default function AppSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-primary-foreground hover:bg-sidebar-accent ${pathname.startsWith(item.href) ? "bg-sidebar-accent text-sidebar-primary-foreground" : ""}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent ${pathname.startsWith(item.href) ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
