@@ -3,12 +3,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Building,
   User,
 } from "lucide-react";
-import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
 
@@ -27,7 +26,7 @@ export default function AppSidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-[220px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
         <div className="flex h-20 items-center justify-center px-4 mb-4">
              <Link href="/seguros">
                  <Image 
