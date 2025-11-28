@@ -30,7 +30,9 @@ export default function RegisterPage() {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Redirection will be handled after profile creation.
+        // User is signed in, let's redirect.
+        // The profile creation is handled by the form submission.
+        router.push("/seguros");
       }
     });
     return () => unsubscribe();
@@ -54,12 +56,15 @@ export default function RegisterPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. Create their profile document in Firestore
+      // 2. Determine the user's role
+      const userRole = email === 'lvasquez@clinicaidb.com.ve' ? 'admin' : 'supervisor';
+
+      // 3. Create their profile document in Firestore
       const userProfile = {
         id: user.uid,
         nombre: nombre,
         email: user.email,
-        rol: "supervisor", // Default role for new users
+        rol: userRole,
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -68,8 +73,9 @@ export default function RegisterPage() {
       // The `await` here is crucial. We wait for the profile to be created.
       await setDoc(doc(firestore, "users", user.uid), userProfile);
       
-      // 3. Now that the profile is created, we can safely redirect.
-      router.push("/seguros");
+      // 4. Now that the profile is created, we can safely redirect.
+      // The onAuthStateChanged listener will handle the final redirect.
+      // No need to push here, as the listener will catch the new user state.
 
     } catch (error: any) {
       console.error("Error during registration:", error);
