@@ -21,7 +21,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Edit, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,16 +38,6 @@ import { Input } from '@/components/ui/input';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { UserSheet } from '@/components/usuarios/user-sheet';
 import { deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-
-
-function getInitials(name: string) {
-  if (!name) return 'U';
-  const names = name.split(' ');
-  if (names.length > 1) {
-    return `${names[0][0]}${names[names.length - 1][0]}`;
-  }
-  return name.substring(0, 2);
-}
 
 
 export default function UsuariosPage() {
@@ -176,9 +165,6 @@ export default function UsuariosPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">
-                    <span className="sr-only">Avatar</span>
-                  </TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Rol</TableHead>
@@ -195,14 +181,6 @@ export default function UsuariosPage() {
                 {filteredUsers && filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="hidden sm:table-cell">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={user.avatar_url} alt="Avatar" />
-                          <AvatarFallback>
-                            {getInitials(user.nombre)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </TableCell>
                       <TableCell className="font-medium">{user.nombre} ({user.sucursal})</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
@@ -226,7 +204,7 @@ export default function UsuariosPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       {searchTerm ? 'No se encontraron usuarios con ese criterio.' : 'No se encontraron usuarios.'}
                     </TableCell>
                   </TableRow>
