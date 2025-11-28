@@ -32,7 +32,7 @@ export default function AppSidebar() {
              <Link href="/seguros" className="relative h-16 w-40">
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
-                  alt="IDB Clinicas Logo"
+                  alt="IDB_Clinicas_Logo"
                   fill
                   style={{ objectFit: 'contain' }}
                   priority
