@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth, initiateEmailSignUp, useFirestore, useUser } from "@/firebase";
+import { useAuth, initiateEmailSignUp, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -24,27 +24,33 @@ export default function RegisterPage() {
   const firestore = useFirestore();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formValues, setFormValues] = useState({ email: '', password: '', firstName: '', lastName: '' });
 
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const firstName = formData.get("first-name") as string;
+    const lastName = formData.get("last-name") as string;
+
+    setFormValues({ email, password, firstName, lastName });
     setIsSubmitting(true);
-    const email = (event.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (event.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
     
     // Non-blocking call
     initiateEmailSignUp(auth, email, password);
   };
   
   useEffect(() => {
-    if (!auth || !firestore) return;
+    if (!auth || !firestore || !isSubmitting) return;
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && isSubmitting) {
+      if (user && user.email === formValues.email) {
         // Create user profile document in Firestore
         const userRef = doc(firestore, `users/${user.uid}`);
         setDocumentNonBlocking(userRef, {
             id: user.uid,
-            // Combine first and last name from form, or use email as fallback
-            nombre: (document.getElementById('first-name') as HTMLInputElement)?.value + ' ' + (document.getElementById('last-name') as HTMLInputElement)?.value || user.email?.split('@')[0],
+            nombre: `${formValues.firstName} ${formValues.lastName}`.trim() || user.email?.split('@')[0],
             email: user.email,
             rol: 'supervisor', // Default role for new users changed to supervisor
             is_active: true,
@@ -52,13 +58,16 @@ export default function RegisterPage() {
             updated_at: new Date().toISOString(),
         }, { merge: true });
         
-        router.push("/seguros");
-        setIsSubmitting(false); // Reset submission state
+        // Use a short delay to ensure the document is likely written before redirecting
+        setTimeout(() => {
+            router.push("/seguros");
+            setIsSubmitting(false); // Reset submission state
+        }, 500); // 500ms delay
       }
     });
 
     return () => unsubscribe(); // Cleanup subscription on unmount
-  }, [auth, firestore, router, isSubmitting]);
+  }, [auth, firestore, router, isSubmitting, formValues]);
 
 
   return (
@@ -74,11 +83,11 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="first-name">Nombre</Label>
-              <Input id="first-name" placeholder="Max" required />
+              <Input id="first-name" name="first-name" placeholder="Max" required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="last-name">Apellido</Label>
-              <Input id="last-name" placeholder="Robinson" required />
+              <Input id="last-name" name="last-name" placeholder="Robinson" required />
             </div>
           </div>
           <div className="grid gap-2">
