@@ -59,7 +59,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
         <CardDescription>
@@ -79,18 +79,19 @@ export default function LoginPage() {
             />
           </div>
           <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Contraseña</Label>
-              <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+            <Label htmlFor="password">Contraseña</Label>
             <Input id="password" name="password" type="password" required />
           </div>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
           </Button>
         </form>
+        <div className="mt-4 text-center text-sm">
+          ¿No tienes una cuenta?{" "}
+          <Link href="/register" className="underline">
+            Regístrate
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
