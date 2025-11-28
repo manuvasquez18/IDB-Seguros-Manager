@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { Edit, PlusCircle, Trash2, UserCheck, UserX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -69,6 +69,10 @@ export default function UsuariosPage() {
   const isLoading = isUserLoading || (user && isUsersLoading);
   
   const canCreate = profile?.rol === 'admin';
+  const canEdit = profile?.rol === 'admin';
+  const canDelete = profile?.rol === 'admin';
+  const canToggleActive = profile?.rol === 'admin';
+
 
   const getRoleVariant = (role: string) => {
     switch (role) {
@@ -155,8 +159,8 @@ export default function UsuariosPage() {
                   <TableHead className="hidden md:table-cell">
                     Fecha de Creación
                   </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Acciones</span>
+                  <TableHead className="text-right">
+                    Acciones
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -187,25 +191,14 @@ export default function UsuariosPage() {
                       <TableCell className="hidden md:table-cell">
                         {user.created_at ? format(new Date(user.created_at), "dd/MM/yyyy") : 'N/A'}
                       </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
+                      <TableCell className="text-right space-x-2">
+                        {canEdit && <Button variant="outline" size="icon"><Edit className="h-4 w-4" /></Button>}
+                        {canToggleActive && (
+                            <Button variant="outline" size="icon">
+                                {user.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                            <DropdownMenuItem>Editar Rol</DropdownMenuItem>
-                            <DropdownMenuItem>
-                              {user.is_active ? 'Desactivar' : 'Activar'}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        )}
+                        {canDelete && <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>}
                       </TableCell>
                     </TableRow>
                   ))
