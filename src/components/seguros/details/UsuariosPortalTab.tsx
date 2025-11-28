@@ -18,7 +18,7 @@ interface UsuariosPortalTabProps {
 
 const formSchema = z.object({
   usuario: z.string().min(1, "El nombre de usuario es obligatorio."),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres.").optional().or(z.literal('')),
+  password: z.string().optional(),
   comentario: z.string().optional(),
 });
 
@@ -45,7 +45,7 @@ export function UsuariosPortalTab({ seguroId, isActive }: UsuariosPortalTabProps
   
   const formFields = [
     { name: 'usuario' as const, label: 'Nombre de Usuario', type: 'text' as const, placeholder: 'Ej: analista_claims' },
-    { name: 'password' as const, label: 'Contraseña', type: 'password' as const, placeholder: canEdit ? 'Dejar en blanco para no cambiar' : '' },
+    { name: 'password' as const, label: 'Contraseña', type: 'text' as const, placeholder: canEdit ? 'Dejar en blanco para no cambiar' : '' },
     { name: 'comentario' as const, label: 'Comentario', type: 'textarea' as const, placeholder: 'Notas adicionales' },
   ];
 
@@ -63,6 +63,7 @@ export function UsuariosPortalTab({ seguroId, isActive }: UsuariosPortalTabProps
   
   const tableColumns = [
     { key: 'usuario' as const, header: 'Usuario' },
+    { key: 'password' as const, header: 'Contraseña', className: 'hidden sm:table-cell' },
     { key: 'comentario' as const, header: 'Comentario', className: 'hidden md:table-cell' },
   ];
 
