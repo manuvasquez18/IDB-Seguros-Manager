@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Seguro } from '@/lib/definitions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,12 +20,14 @@ type TabValue = 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'po
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
   const firestore = useFirestore();
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState<TabValue>('colectivos');
 
   const seguroRef = useMemoFirebase(() => {
-    if (!firestore || !seguroId) return null;
+    // Only run the query if the user is authenticated and firestore is available
+    if (!firestore || !seguroId || !user) return null;
     return doc(firestore, 'seguros', seguroId as string);
-  }, [firestore, seguroId]);
+  }, [firestore, seguroId, user]);
 
   const { data: seguro, isLoading } = useDoc<Seguro>(seguroRef);
 
