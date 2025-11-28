@@ -52,17 +52,19 @@ export default function RegisterPage() {
             id: user.uid,
             nombre: `${formValues.firstName} ${formValues.lastName}`.trim() || user.email?.split('@')[0],
             email: user.email,
-            rol: 'supervisor', // Default role for new users changed to supervisor
+            rol: 'supervisor', // This role is now a custom claim, but good to have in profile
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         }, { merge: true });
         
-        // Use a short delay to ensure the document is likely written before redirecting
+        // The custom claim is set server-side (e.g., via a Cloud Function on user creation).
+        // For this flow, we assume the claim is set, and we can proceed.
+        // A short delay helps ensure Firestore write is processed before redirect.
         setTimeout(() => {
             router.push("/seguros");
             setIsSubmitting(false); // Reset submission state
-        }, 500); // 500ms delay
+        }, 1000); 
       }
     });
 

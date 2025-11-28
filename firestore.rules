@@ -11,21 +11,17 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Function to get the user's role from their profile document
-    function getUserRole(userId) {
-      return get(/databases/$(database)/documents/users/$(userId)).data.rol;
-    }
-
+    // NEW: Functions to get role from the user's auth token (custom claim)
     function isAdmin() {
-      return isSignedIn() && getUserRole(request.auth.uid) == 'admin';
+      return isSignedIn() && request.auth.token.rol == 'admin';
     }
 
     function isSupervisor() {
-      return isSignedIn() && getUserRole(request.auth.uid) == 'supervisor';
+      return isSignedIn() && request.auth.token.rol == 'supervisor';
     }
 
     function isUsuario() {
-        return isSignedIn() && getUserRole(request.auth.uid) == 'usuario';
+        return isSignedIn() && request.auth.token.rol == 'usuario';
     }
     
     function isOwner(userId) {
@@ -36,7 +32,10 @@ service cloud.firestore {
     // Collection Rules
     // ------------------------------------------------------------------------
 
-    // Users can create their own profile, admins can manage any profile.
+    // User profiles can be read by any signed-in user.
+    // Users can only create their own profile.
+    // Users can update their own profile, or an admin can.
+    // Only admins can delete profiles.
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isOwner(userId);

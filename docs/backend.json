@@ -137,7 +137,15 @@
       "required": ["id", "seguro_id", "nombre", "url_storage"]
     }
   },
-  "auth": { "providers": ["password", "anonymous"] },
+  "auth": { 
+    "providers": ["password", "anonymous"],
+    "customClaims": {
+      "rol": {
+        "type": "string",
+        "enum": ["admin", "supervisor", "usuario"]
+      }
+    }
+  },
   "firestore": {
     "structure": [
       {
