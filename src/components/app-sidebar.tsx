@@ -39,20 +39,19 @@ export default function AppSidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-[280px] flex-col border-r bg-sidebar text-sidebar-foreground sm:flex">
-        <div className="flex h-16 items-center px-4 mb-4">
+        <div className="flex h-20 items-center justify-center px-4 mb-4">
              <Link href="/seguros">
                  <Image 
                   src="https://lh3.googleusercontent.com/d/1sIw-gKnfRYk5B4-KJCiKUW4iq-TSKHPu"
                   alt="IDB Clinicas Logo"
-                  width={200}
-                  height={60}
+                  width={220}
+                  height={68}
                   className="object-contain"
                   priority
                 />
              </Link>
-          </div>
+        </div>
         <div className="flex flex-col gap-2 p-4">
-          
           <nav className="flex flex-col gap-2">
             {menuItems.map((item) => (
               userCanView(item.roles) && (
@@ -80,4 +79,3 @@ export default function AppSidebar() {
     </aside>
   );
 }
-
