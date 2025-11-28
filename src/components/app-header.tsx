@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -18,12 +19,29 @@ import { Button } from "@/components/ui/button";
 import { CircleUser } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+function HeaderSidebarTrigger() {
+    const isMobile = useIsMobile();
+
+    if (!isMobile) {
+        return null;
+    }
+
+    return (
+        <div className="md:hidden">
+            <SidebarTrigger />
+        </div>
+    );
+}
+
 
 export default function AppHeader() {
   const { user } = useUser();
   const auth = useAuth();
   const { profile } = useUserProfile();
   const router = useRouter();
+  
 
   const handleLogout = () => {
     if (auth) {
@@ -35,9 +53,7 @@ export default function AppHeader() {
 
   return (
     <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-30">
-      <div className="md:hidden">
-        <SidebarTrigger />
-      </div>
+      <HeaderSidebarTrigger />
 
       <div className="w-full flex-1">
         {/* Search bar removed from here */}
