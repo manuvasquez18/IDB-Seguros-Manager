@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import type { Contacto } from '@/lib/definitions';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,10 +42,27 @@ export function ContactosTab({ seguroId, isActive }: ContactosTabProps) {
 
   const itemsQuery = useMemoFirebase(() => {
     if (!firestore || !isActive) return null;
-    return collection(firestore, subcollectionPath);
+    return query(collection(firestore, subcollectionPath));
   }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<Contacto>(itemsQuery);
+  
+  const sortedItems = useMemo(() => {
+    if (!items) return [];
+    return [...items].sort((a, b) => {
+      const aStartsWithNumber = /^\d/.test(a.nombre);
+      const bStartsWithNumber = /^\d/.test(b.nombre);
+
+      if (aStartsWithNumber && !bStartsWithNumber) {
+        return -1; // a comes first
+      }
+      if (!aStartsWithNumber && bStartsWithNumber) {
+        return 1; // b comes first
+      }
+      // If both start with a number or both don't, sort alphabetically
+      return a.nombre.localeCompare(b.nombre);
+    });
+  }, [items]);
 
   const canCreate = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canEdit = profile?.rol === 'admin' || profile?.rol === 'supervisor';
@@ -75,7 +92,7 @@ export function ContactosTab({ seguroId, isActive }: ContactosTabProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Contactos</CardTitle>
-          <CardDescription>Personas de contacto para esta póliza.</CardDescription>
+          <CardDescription>Personas y correos de contacto para esta póliza.</CardDescription>
         </div>
         {canCreate && (
           <Button onClick={handleAdd}>
@@ -86,7 +103,7 @@ export function ContactosTab({ seguroId, isActive }: ContactosTabProps) {
       </CardHeader>
       <CardContent>
          <GenericSubcollectionTable<Contacto>
-            items={items}
+            items={sortedItems}
             isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
