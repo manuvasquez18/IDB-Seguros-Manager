@@ -17,8 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Bell, CircleUser, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useUser } from "@/firebase";
 
 export default function AppHeader() {
+  const { user } = useUser();
   const avatar = PlaceHolderImages.find(p => p.id === 'user-avatar-1');
 
   return (
@@ -48,7 +50,15 @@ export default function AppHeader() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            {avatar ? (
+            {user && user.photoURL ? (
+                <Image
+                  src={user.photoURL}
+                  width={36}
+                  height={36}
+                  alt="User avatar"
+                  className="rounded-full"
+                />
+            ) : avatar ? (
                 <Image
                   src={avatar.imageUrl}
                   width={36}
@@ -64,7 +74,7 @@ export default function AppHeader() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+          <DropdownMenuLabel>{user ? user.email : 'Mi Cuenta'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Link href="/settings">Configuración</Link>

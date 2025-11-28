@@ -21,8 +21,9 @@ import {
   File,
   Settings,
   LogOut,
-  Landmark,
+  Building,
 } from "lucide-react";
+import { useAuth } from "@/firebase";
 
 const menuItems = [
   { href: "/seguros", label: "Seguros", icon: Shield },
@@ -36,12 +37,17 @@ const menuItems = [
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const auth = useAuth();
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
 
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-2">
-          <Landmark className="w-8 h-8 text-sidebar-foreground" />
+          <Building className="w-8 h-8 text-sidebar-foreground" />
           <h1 className="text-xl font-bold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
             IDB Seguros
           </h1>
@@ -76,7 +82,7 @@ export default function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{children: "Cerrar Sesión", side: "right"}}>
+            <SidebarMenuButton onClick={handleLogout} asChild tooltip={{children: "Cerrar Sesión", side: "right"}}>
               <Link href="/login">
                 <LogOut />
                 <span>Cerrar Sesión</span>
