@@ -1,6 +1,6 @@
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/definitions';
 import {
@@ -42,13 +42,17 @@ function getInitials(name: string) {
 
 export default function UsuariosPage() {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
 
   const usersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // Only create the query if the user is logged in
+    if (!firestore || !user) return null;
     return collection(firestore, 'users');
-  }, [firestore]);
+  }, [firestore, user]);
 
-  const { data: users, isLoading } = useCollection<UserProfile>(usersQuery);
+  const { data: users, isLoading: isUsersLoading } = useCollection<UserProfile>(usersQuery);
+  
+  const isLoading = isUserLoading || (user && isUsersLoading);
 
   const getRoleVariant = (role: string) => {
     switch (role) {
