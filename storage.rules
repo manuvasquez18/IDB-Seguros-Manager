@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if a user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Allow read access to everyone for all files.
+    // This is useful for displaying images, documents, etc. publicly.
+    match /{allPaths=**} {
+      allow read;
+    }
+
+    // Allow write access only to authenticated users.
+    // This prevents anonymous users from uploading files.
+    // We are scoping writes to the `seguros` path.
+    match /seguros/{seguroId}/{subcollection}/{documentId}/{fileName} {
+       allow write: if isSignedIn();
+    }
+  }
+}
