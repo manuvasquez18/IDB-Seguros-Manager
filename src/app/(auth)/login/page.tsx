@@ -90,16 +90,7 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
           </Button>
-          <Button variant="outline" className="w-full" type="button" disabled>
-            Iniciar sesión con Google
-          </Button>
         </form>
-        <div className="mt-4 text-center text-sm">
-          ¿No tienes una cuenta?{" "}
-          <Link href="/register" className="underline">
-            Regístrate
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );
