@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https' ,
         hostname: 'citasprevimedicaidb.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'idbclinicas.com',
       }
     ],
   },
