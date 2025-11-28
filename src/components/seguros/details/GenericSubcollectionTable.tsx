@@ -79,7 +79,7 @@ export function GenericSubcollectionTable<T extends ItemWithId>({
             {columns.map(col => (
               <TableHead key={col.key as string} className={col.className}>{col.header}</TableHead>
             ))}
-            {showActionsColumn && <TableHead className="text-right w-[100px]">Acciones</TableHead>}
+            {showActionsColumn && <TableHead className="text-right">Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,7 +92,7 @@ export function GenericSubcollectionTable<T extends ItemWithId>({
                   </TableCell>
                 ))}
                 {showActionsColumn && (
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-right space-x-2 whitespace-nowrap w-[100px]">
                     {onEdit && <Button variant="outline" size="icon" onClick={() => onEdit(item)}><Edit className="h-4 w-4" /></Button>}
                     {onDelete && <Button variant="destructive" size="icon" onClick={() => openDeleteDialog(item)}><Trash2 className="h-4 w-4" /></Button>}
                   </TableCell>
