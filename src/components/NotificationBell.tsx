@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 export function NotificationBell() {
@@ -20,10 +19,11 @@ export function NotificationBell() {
   const { user, isUserLoading } = useUser();
 
   const notificationsQuery = useMemoFirebase(() => {
-    // Wait until auth state is determined and user is logged in.
-    if (isUserLoading || !user || !firestore) return null;
+    // CRITICAL: Only create the query when auth state is fully resolved and a user is present.
+    if (isUserLoading || !user || !firestore) {
+      return null;
+    }
     
-    // Query the 'notificaciones' collection group
     return query(
       collectionGroup(firestore, 'notificaciones'), 
       orderBy('created_at', 'desc'), 
@@ -31,8 +31,12 @@ export function NotificationBell() {
     );
   }, [firestore, user, isUserLoading]);
 
-  // The hook will now wait until the query is not null
-  const { data: notifications, isLoading } = useCollection<Notificacion>(notificationsQuery);
+  // Pass the (potentially null) query to the hook.
+  // The hook's `isLoading` will be true if the query is not null but data hasn't arrived.
+  const { data: notifications, isLoading: areNotificationsLoading } = useCollection<Notificacion>(notificationsQuery);
+  
+  // The overall loading state depends on both auth check and notification fetching (if it runs).
+  const isLoading = isUserLoading || (!!notificationsQuery && areNotificationsLoading);
 
   return (
     <DropdownMenu>
