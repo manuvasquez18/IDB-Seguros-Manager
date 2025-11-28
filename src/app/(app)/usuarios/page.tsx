@@ -96,6 +96,7 @@ export default function UsuariosPage() {
 
     return users.filter(user => 
       (user.nombre && user.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.sucursal && user.sucursal.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [users, searchTerm]);
@@ -158,7 +159,7 @@ export default function UsuariosPage() {
              <div className="flex items-center gap-2">
                <Input
                   type="search"
-                  placeholder="Buscar por nombre, email..."
+                  placeholder="Buscar por nombre, sucursal, email..."
                   className="w-full max-w-sm appearance-none bg-background shadow-none"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -202,7 +203,7 @@ export default function UsuariosPage() {
                           </AvatarFallback>
                         </Avatar>
                       </TableCell>
-                      <TableCell className="font-medium">{user.nombre}</TableCell>
+                      <TableCell className="font-medium">{user.nombre} ({user.sucursal})</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Badge variant={getRoleVariant(user.rol)}>
@@ -234,11 +235,13 @@ export default function UsuariosPage() {
             </Table>
           </CardContent>
         </Card>
-        <UserSheet
+        {canCreate && (
+          <UserSheet
             open={sheetOpen}
             onOpenChange={setSheetOpen}
             user={selectedUser}
-        />
+          />
+        )}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
             <AlertDialogContent>
                 <AlertDialogHeader>

@@ -41,6 +41,7 @@ export function UserSheet({ open, onOpenChange, user }: UserSheetProps) {
             const userRef = doc(firestore, "users", user.id);
             const updatedProfile = {
                 nombre: data.nombre,
+                sucursal: data.sucursal,
                 rol: data.rol,
                 updated_at: new Date().toISOString(),
             };
@@ -51,10 +52,11 @@ export function UserSheet({ open, onOpenChange, user }: UserSheetProps) {
             });
         } else {
             // Creating a new user
-            const { user: newUser } = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            const { user: newUser } = await createUserWithEmailAndPassword(auth, data.email, data.password!);
             const userProfile: Omit<UserProfile, 'last_login' | 'avatar_url' | 'telefono'> = {
                 id: newUser.uid,
                 nombre: data.nombre,
+                sucursal: data.sucursal,
                 email: data.email,
                 rol: data.rol,
                 is_active: true,
@@ -87,7 +89,7 @@ export function UserSheet({ open, onOpenChange, user }: UserSheetProps) {
           <SheetTitle>{isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</SheetTitle>
           <SheetDescription>
             {isEditMode 
-                ? 'Actualiza los detalles del usuario. El email y la contraseña no se pueden cambiar aquí.'
+                ? 'Actualiza los detalles del usuario. El email no se puede cambiar aquí.'
                 : 'Rellena los datos para registrar un nuevo usuario en el sistema.'
             }
           </SheetDescription>

@@ -2,6 +2,7 @@
 export type UserProfile = {
     id: string; // Corresponds to Firebase Auth UID
     nombre: string;
+    sucursal: string;
     email: string;
     telefono?: string;
     rol: 'admin' | 'supervisor' | 'usuario';

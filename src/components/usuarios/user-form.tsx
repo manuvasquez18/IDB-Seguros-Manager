@@ -26,6 +26,7 @@ import type { UserProfile } from "@/lib/definitions";
 
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio."),
+  sucursal: z.string().min(1, "La sucursal es obligatoria."),
   email: z.string().email("Debe ser un correo electrónico válido."),
   // Make password optional, but if provided, must be at least 6 chars
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres.").optional().or(z.literal('')),
@@ -50,6 +51,7 @@ export function UserForm({ onSubmit, isSubmitting, defaultValues, isEditMode }: 
     resolver: zodResolver(isEditMode ? editSchema : formSchema),
     defaultValues: defaultValues || {
       nombre: '',
+      sucursal: '',
       email: '',
       password: '',
       rol: 'usuario',
@@ -67,6 +69,19 @@ export function UserForm({ onSubmit, isSubmitting, defaultValues, isEditMode }: 
               <FormLabel>Nombre Completo</FormLabel>
               <FormControl>
                 <Input placeholder="Ej: Jane Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="sucursal"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sucursal</FormLabel>
+              <FormControl>
+                <Input placeholder="Ej: Principal" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

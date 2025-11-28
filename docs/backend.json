@@ -8,6 +8,7 @@
       "properties": {
         "id": { "type": "string", "description": "User's unique ID, matches Firebase Auth UID." },
         "nombre": { "type": "string" },
+        "sucursal": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "telefono": { "type": "string" },
         "rol": { "type": "string", "enum": ["admin", "supervisor", "usuario"] },
@@ -17,7 +18,7 @@
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "nombre", "email", "rol", "is_active"]
+      "required": ["id", "nombre", "sucursal", "email", "rol", "is_active"]
     },
     "Seguro": {
       "title": "Seguro",
