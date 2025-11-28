@@ -53,10 +53,8 @@ service cloud.firestore {
       // Any signed-in user can read insurance policies.
       allow read: if isSignedIn();
       
-      // Allow creation for any signed-in user. The more restrictive logic for
-      // updates and deletes will secure the data after creation. This solves
-      // the race condition during new user registration.
-      allow create: if isSignedIn();
+      // Allow creation for admins or supervisors.
+      allow create: if isAdmin() || isSupervisor();
 
       // Allow updates if the user is an admin or supervisor.
       allow update: if isAdmin() || isSupervisor();
