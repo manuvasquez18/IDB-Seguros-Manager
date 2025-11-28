@@ -64,13 +64,13 @@ export function NotificacionesTab({ seguroId, isActive }: NotificacionesTabProps
   
   const tableColumns = [
     { key: 'titulo' as const, header: 'Título' },
+    { key: 'cuerpo' as const, header: 'Cuerpo', className: 'hidden md:table-cell' },
     { 
       key: 'url' as const, 
       header: 'URL',
       render: (item: Notificacion) => item.url ? <Link href={item.url} target="_blank" className="text-primary underline">{item.url}</Link> : 'N/A',
       className: 'hidden md:table-cell' 
     },
-    { key: 'cuerpo' as const, header: 'Cuerpo', className: 'hidden md:table-cell' },
   ];
 
   return (
