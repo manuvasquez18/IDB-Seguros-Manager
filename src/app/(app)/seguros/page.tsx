@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Edit, Trash2, Eye, Search } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input";
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 import type { Seguro } from "@/lib/definitions";
@@ -56,9 +57,9 @@ export default function SegurosPage() {
   const [selectedSeguro, setSelectedSeguro] = useState<Seguro | undefined>(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [seguroToDelete, setSeguroToDelete] = useState<Seguro | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const segurosQuery = useMemoFirebase(() => {
-    // Only run the query if the user is authenticated and firestore is available
     if (!firestore || !user) return null;
     return collection(firestore, 'seguros');
   }, [firestore, user]);
@@ -70,7 +71,18 @@ export default function SegurosPage() {
   const canCreate = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canEdit = profile?.rol === 'admin' || profile?.rol === 'supervisor';
   const canDelete = profile?.rol === 'admin';
-  const canViewDetails = true; // All roles can view details
+  const canViewDetails = true;
+
+  const filteredSeguros = useMemo(() => {
+    if (!seguros) return [];
+    if (!searchTerm) return seguros;
+
+    return seguros.filter(seguro => 
+      seguro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (seguro.contacto && seguro.contacto.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (seguro.rif && seguro.rif.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [seguros, searchTerm]);
 
   const handleAdd = () => {
     if (!canCreate) return;
@@ -130,10 +142,24 @@ export default function SegurosPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Seguros Registrados</CardTitle>
-            <CardDescription>
-              Una lista de todos los seguros en el sistema. Haz clic en un seguro para ver sus detalles.
-            </CardDescription>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <CardTitle>Seguros Registrados</CardTitle>
+                <CardDescription>
+                  Una lista de todos los seguros en el sistema.
+                </CardDescription>
+              </div>
+              <div className="relative w-full max-w-sm">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Buscar por nombre, contacto, RIF..."
+                  className="w-full appearance-none bg-background pl-8 shadow-none"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -151,8 +177,8 @@ export default function SegurosPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {seguros && seguros.length > 0 ? (
-                  seguros.map((seguro) => (
+                {filteredSeguros && filteredSeguros.length > 0 ? (
+                  filteredSeguros.map((seguro) => (
                     <TableRow key={seguro.id} className="cursor-pointer" onClick={() => handleViewDetails(seguro)}>
                       <TableCell className="font-medium">{seguro.nombre}</TableCell>
                       <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
@@ -185,7 +211,7 @@ export default function SegurosPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">
-                      No se encontraron seguros.
+                      {searchTerm ? 'No se encontraron seguros con ese criterio.' : 'No se encontraron seguros.'}
                     </TableCell>
                   </TableRow>
                 )}
