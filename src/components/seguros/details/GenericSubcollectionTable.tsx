@@ -79,7 +79,7 @@ export function GenericSubcollectionTable<T extends ItemWithId>({
             {columns.map(col => (
               <TableHead key={col.key as string} className={col.className}>{col.header}</TableHead>
             ))}
-            {showActionsColumn && <TableHead className="text-right">Acciones</TableHead>}
+            {showActionsColumn && <TableHead className="text-right w-[100px]">Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
