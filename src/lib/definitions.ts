@@ -25,6 +25,7 @@ export type Seguro = {
     forma_pago?: string;
     tipo_precio?: string;
     estatus: 'Activo' | 'Suspendido';
+    tipo_seguro: 'Seguro Nacional' | 'Seguro Internacional';
     baremo?: string;
     portal_web?: string;
     fact_a_nombre?: string;

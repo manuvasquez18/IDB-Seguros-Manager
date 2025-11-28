@@ -39,8 +39,9 @@ export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
       id: seguroId,
       nombre: data.nombre,
       estatus: data.estatus,
+      tipo_seguro: data.tipo_seguro,
       updated_at: new Date().toISOString(),
-      ...(isEditMode ? {} : { created_at: new Date().toISOString() }),
+      ...(isEditMode ? { created_at: seguro.created_at } : { created_at: new Date().toISOString() }),
     };
     
     setDocumentNonBlocking(docRef, dataToSave, { merge: isEditMode });
@@ -69,5 +70,3 @@ export function SeguroSheet({ open, onOpenChange, seguro }: SeguroSheetProps) {
     </Sheet>
   );
 }
-
-    

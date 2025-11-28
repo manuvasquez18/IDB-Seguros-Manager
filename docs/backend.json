@@ -36,6 +36,7 @@
         "forma_pago": { "type": "string" },
         "tipo_precio": { "type": "string" },
         "estatus": { "type": "string", "enum": ["Activo", "Suspendido"] },
+        "tipo_seguro": { "type": "string", "enum": ["Seguro Nacional", "Seguro Internacional"] },
         "baremo": { "type": "string" },
         "portal_web": { "type": "string", "format": "uri" },
         "fact_a_nombre": { "type": "string" },
@@ -50,7 +51,7 @@
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "nombre", "estatus"]
+      "required": ["id", "nombre", "estatus", "tipo_seguro"]
     },
     "Colectivo": {
       "title": "Colectivo",

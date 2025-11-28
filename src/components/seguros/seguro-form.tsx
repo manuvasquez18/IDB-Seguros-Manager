@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio."),
   estatus: z.enum(["Activo", "Suspendido"]),
+  tipo_seguro: z.enum(["Seguro Nacional", "Seguro Internacional"]),
   contacto: z.string().optional(),
   moneda: z.string().optional(),
   rif: z.string().optional(),
@@ -67,6 +68,7 @@ export function SeguroForm({ onSubmit, defaultValues, isEditMode }: SeguroFormPr
     defaultValues: defaultValues || {
       nombre: '',
       estatus: 'Activo',
+      tipo_seguro: 'Seguro Nacional',
       contacto: '',
       moneda: '',
       rif: '',
@@ -110,6 +112,27 @@ export function SeguroForm({ onSubmit, defaultValues, isEditMode }: SeguroFormPr
                   <FormControl>
                     <Input placeholder="Ej: Póliza de Salud Global" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="tipo_seguro"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Seguro</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Seguro Nacional">Seguro Nacional</SelectItem>
+                      <SelectItem value="Seguro Internacional">Seguro Internacional</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

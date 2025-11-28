@@ -40,6 +40,66 @@ import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
 
+const SegurosTable = ({
+  seguros,
+  canViewDetails,
+  canEdit,
+  canDelete,
+  onViewDetails,
+  onEdit,
+  onDelete,
+}: {
+  seguros: Seguro[];
+  canViewDetails: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  onViewDetails: (seguro: Seguro) => void;
+  onEdit: (seguro: Seguro) => void;
+  onDelete: (seguro: Seguro) => void;
+}) => {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nombre</TableHead>
+          <TableHead className="hidden md:table-cell">Contacto</TableHead>
+          <TableHead className="hidden lg:table-cell">RIF</TableHead>
+          <TableHead>Estatus</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {seguros && seguros.length > 0 ? (
+          seguros.map((seguro) => (
+            <TableRow key={seguro.id}>
+              <TableCell className="font-medium">{seguro.nombre}</TableCell>
+              <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
+              <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
+              <TableCell>
+                 <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
+                  {seguro.estatus}
+                </Badge>
+              </TableCell>
+                <TableCell className="text-right space-x-2">
+                   {canViewDetails && <Button variant="outline" size="icon" onClick={() => onViewDetails(seguro)}><Eye className="h-4 w-4" /></Button>}
+                   {canEdit && <Button variant="outline" size="icon" onClick={() => onEdit(seguro)}><Edit className="h-4 w-4" /></Button>}
+                   {canDelete && <Button variant="destructive" size="icon" onClick={() => onDelete(seguro)}><Trash2 className="h-4 w-4" /></Button>}
+                </TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center h-24">
+              No se encontraron seguros en esta categoría.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  )
+}
+
+
 export default function SegurosPage() {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
@@ -66,15 +126,25 @@ export default function SegurosPage() {
   const canDelete = profile?.rol === 'admin';
   const canViewDetails = true;
 
-  const filteredSeguros = useMemo(() => {
-    if (!seguros) return [];
-    if (!searchTerm) return seguros;
-
-    return seguros.filter(seguro => 
+  const filteredAndGroupedSeguros = useMemo(() => {
+    if (!seguros) return { nacionales: [], internacionales: [] };
+    
+    const filtered = seguros.filter(seguro => 
       seguro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (seguro.contacto && seguro.contacto.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (seguro.rif && seguro.rif.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    const nacionales = filtered
+      .filter(s => s.tipo_seguro === 'Seguro Nacional')
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    const internacionales = filtered
+      .filter(s => s.tipo_seguro === 'Seguro Internacional')
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    return { nacionales, internacionales };
+
   }, [seguros, searchTerm]);
 
   const handleAdd = () => {
@@ -117,71 +187,69 @@ export default function SegurosPage() {
 
   return (
     <>
-      <Card>
+      <div className="flex flex-col gap-8">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Seguros</CardTitle>
-              <CardDescription>
-                Administra las pólizas de seguro de tus clientes.
-              </CardDescription>
-            </div>
-             <div className="flex items-center gap-2">
-               <Input
-                  type="search"
-                  placeholder="Buscar por nombre, RIF..."
-                  className="w-full max-w-sm appearance-none bg-background shadow-none"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                {canCreate && (
-                    <Button onClick={handleAdd}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Añadir Seguro
-                    </Button>
-                )}
-            </div>
+              <div>
+                <CardTitle>Seguros</CardTitle>
+                <CardDescription>
+                  Administra las pólizas de seguro de tus clientes.
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                    type="search"
+                    placeholder="Buscar por nombre, RIF..."
+                    className="w-full max-w-sm appearance-none bg-background shadow-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {canCreate && (
+                      <Button onClick={handleAdd}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Añadir Seguro
+                      </Button>
+                  )}
+              </div>
+            </CardHeader>
+        </Card>
+
+        {/* Seguros Nacionales */}
+        <Card>
+            <CardHeader>
+              <CardTitle>Seguros Nacionales</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SegurosTable 
+                seguros={filteredAndGroupedSeguros.nacionales}
+                canViewDetails={canViewDetails}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                onViewDetails={handleViewDetails}
+                onEdit={handleEdit}
+                onDelete={openDeleteDialog}
+              />
+            </CardContent>
+          </Card>
+
+        {/* Seguros Internacionales */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Seguros Internacionales</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead className="hidden md:table-cell">Contacto</TableHead>
-                  <TableHead className="hidden lg:table-cell">RIF</TableHead>
-                  <TableHead>Estatus</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSeguros && filteredSeguros.length > 0 ? (
-                  filteredSeguros.map((seguro) => (
-                    <TableRow key={seguro.id}>
-                      <TableCell className="font-medium">{seguro.nombre}</TableCell>
-                      <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
-                      <TableCell>
-                         <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
-                          {seguro.estatus}
-                        </Badge>
-                      </TableCell>
-                        <TableCell className="text-right space-x-2">
-                           {canViewDetails && <Button variant="outline" size="icon" onClick={() => handleViewDetails(seguro)}><Eye className="h-4 w-4" /></Button>}
-                           {canEdit && <Button variant="outline" size="icon" onClick={() => handleEdit(seguro)}><Edit className="h-4 w-4" /></Button>}
-                           {canDelete && <Button variant="destructive" size="icon" onClick={() => openDeleteDialog(seguro)}><Trash2 className="h-4 w-4" /></Button>}
-                        </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
-                      {searchTerm ? 'No se encontraron seguros con ese criterio.' : 'No se encontraron seguros.'}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <SegurosTable 
+              seguros={filteredAndGroupedSeguros.internacionales}
+              canViewDetails={canViewDetails}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onViewDetails={handleViewDetails}
+              onEdit={handleEdit}
+              onDelete={openDeleteDialog}
+            />
           </CardContent>
         </Card>
+      </div>
       
       {canCreate && (
           <SeguroSheet

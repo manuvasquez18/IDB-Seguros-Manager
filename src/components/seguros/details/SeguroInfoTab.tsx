@@ -1,3 +1,4 @@
+
 'use client';
 import type { Seguro } from '@/lib/definitions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,6 +67,7 @@ export function SeguroInfoTab({ seguro, isActive, onEdit }: SeguroInfoTabProps) 
                                 </Badge>
                             </span>
                         </div>
+                        <DetailItem label="Tipo de Seguro" value={seguro.tipo_seguro} />
                         <DetailItem label="Contacto" value={seguro.contacto} />
                         <DetailItem label="RIF" value={seguro.rif} />
                         <DetailItem label="Moneda" value={seguro.moneda} />
