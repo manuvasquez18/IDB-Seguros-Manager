@@ -13,6 +13,7 @@ import * as z from "zod";
 
 interface CorreosTabProps {
   seguroId: string;
+  isActive: boolean;
 }
 
 const formSchema = z.object({
@@ -29,7 +30,7 @@ const formFields = [
   { name: 'comentario' as const, label: 'Comentario', type: 'textarea' as const, placeholder: 'Notas adicionales sobre este correo' },
 ];
 
-export function CorreosTab({ seguroId }: CorreosTabProps) {
+export function CorreosTab({ seguroId, isActive }: CorreosTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -38,9 +39,9 @@ export function CorreosTab({ seguroId }: CorreosTabProps) {
   const subcollectionPath = `seguros/${seguroId}/correos`;
 
   const itemsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isActive) return null;
     return collection(firestore, subcollectionPath);
-  }, [firestore, subcollectionPath]);
+  }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<Correo>(itemsQuery);
 
@@ -83,7 +84,7 @@ export function CorreosTab({ seguroId }: CorreosTabProps) {
       <CardContent>
          <GenericSubcollectionTable<Correo>
             items={items}
-            isLoading={isLoading}
+            isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
             onDelete={canDelete ? 'firestore' : undefined}

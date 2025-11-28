@@ -5,7 +5,6 @@ import { collection } from 'firebase/firestore';
 import type { Colectivo } from '@/lib/definitions';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { GenericSubcollectionSheet } from './GenericSubcollectionSheet';
@@ -14,6 +13,7 @@ import * as z from "zod";
 
 interface ColectivosTabProps {
   seguroId: string;
+  isActive: boolean;
 }
 
 const formSchema = z.object({
@@ -29,7 +29,7 @@ const formFields = [
 ];
 
 
-export function ColectivosTab({ seguroId }: ColectivosTabProps) {
+export function ColectivosTab({ seguroId, isActive }: ColectivosTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -38,9 +38,9 @@ export function ColectivosTab({ seguroId }: ColectivosTabProps) {
   const subcollectionPath = `seguros/${seguroId}/colectivos`;
 
   const itemsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isActive) return null;
     return collection(firestore, subcollectionPath);
-  }, [firestore, subcollectionPath]);
+  }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<Colectivo>(itemsQuery);
 
@@ -82,7 +82,7 @@ export function ColectivosTab({ seguroId }: ColectivosTabProps) {
       <CardContent>
          <GenericSubcollectionTable<Colectivo>
             items={items}
-            isLoading={isLoading}
+            isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
             onDelete={canDelete ? 'firestore' : undefined}

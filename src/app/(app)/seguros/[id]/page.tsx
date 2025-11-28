@@ -1,9 +1,9 @@
 'use client';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc, collection } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import type { Seguro } from '@/lib/definitions';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -15,9 +15,12 @@ import { UsuariosPortalTab } from '@/components/seguros/details/UsuariosPortalTa
 import { PopupsTab } from '@/components/seguros/details/PopupsTab';
 import { ArchivosTab } from '@/components/seguros/details/ArchivosTab';
 
+type TabValue = 'colectivos' | 'contactos' | 'correos' | 'usuarios_portal' | 'popups' | 'archivos';
+
 export default function SeguroDetailPage() {
   const { id: seguroId } = useParams();
   const firestore = useFirestore();
+  const [activeTab, setActiveTab] = useState<TabValue>('colectivos');
 
   const seguroRef = useMemoFirebase(() => {
     if (!firestore || !seguroId) return null;
@@ -65,7 +68,7 @@ export default function SeguroDetailPage() {
         </div>
       </div>
       
-      <Tabs defaultValue="colectivos" className="w-full">
+      <Tabs defaultValue="colectivos" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="colectivos">Colectivos</TabsTrigger>
           <TabsTrigger value="contactos">Contactos</TabsTrigger>
@@ -76,22 +79,22 @@ export default function SeguroDetailPage() {
         </TabsList>
 
         <TabsContent value="colectivos">
-          <ColectivosTab seguroId={seguro.id} />
+          <ColectivosTab seguroId={seguro.id} isActive={activeTab === 'colectivos'} />
         </TabsContent>
         <TabsContent value="contactos">
-          <ContactosTab seguroId={seguro.id} />
+          <ContactosTab seguroId={seguro.id} isActive={activeTab === 'contactos'} />
         </TabsContent>
         <TabsContent value="correos">
-          <CorreosTab seguroId={seguro.id} />
+          <CorreosTab seguroId={seguro.id} isActive={activeTab === 'correos'} />
         </TabsContent>
         <TabsContent value="usuarios_portal">
-           <UsuariosPortalTab seguroId={seguro.id} />
+           <UsuariosPortalTab seguroId={seguro.id} isActive={activeTab === 'usuarios_portal'} />
         </TabsContent>
         <TabsContent value="popups">
-          <PopupsTab seguroId={seguro.id} />
+          <PopupsTab seguroId={seguro.id} isActive={activeTab === 'popups'} />
         </TabsContent>
         <TabsContent value="archivos">
-          <ArchivosTab seguroId={seguro.id} />
+          <ArchivosTab seguroId={seguro.id} isActive={activeTab === 'archivos'} />
         </TabsContent>
       </Tabs>
     </div>

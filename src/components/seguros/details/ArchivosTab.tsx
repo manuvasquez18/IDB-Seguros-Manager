@@ -14,6 +14,7 @@ import Link from 'next/link';
 
 interface ArchivosTabProps {
   seguroId: string;
+  isActive: boolean;
 }
 
 const formSchema = z.object({
@@ -30,7 +31,7 @@ const formFields = [
   { name: 'comentario' as const, label: 'Comentario', type: 'textarea' as const, placeholder: 'Notas sobre el archivo' },
 ];
 
-export function ArchivosTab({ seguroId }: ArchivosTabProps) {
+export function ArchivosTab({ seguroId, isActive }: ArchivosTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -39,9 +40,9 @@ export function ArchivosTab({ seguroId }: ArchivosTabProps) {
   const subcollectionPath = `seguros/${seguroId}/archivos`;
 
   const itemsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isActive) return null;
     return collection(firestore, subcollectionPath);
-  }, [firestore, subcollectionPath]);
+  }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<Archivo>(itemsQuery);
 
@@ -89,7 +90,7 @@ export function ArchivosTab({ seguroId }: ArchivosTabProps) {
       <CardContent>
          <GenericSubcollectionTable<Archivo>
             items={items}
-            isLoading={isLoading}
+            isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
             onDelete={canDelete ? 'firestore' : undefined}

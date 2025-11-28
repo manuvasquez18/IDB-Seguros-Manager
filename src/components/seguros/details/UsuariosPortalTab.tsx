@@ -13,6 +13,7 @@ import * as z from "zod";
 
 interface UsuariosPortalTabProps {
   seguroId: string;
+  isActive: boolean;
 }
 
 const formSchema = z.object({
@@ -23,7 +24,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function UsuariosPortalTab({ seguroId }: UsuariosPortalTabProps) {
+export function UsuariosPortalTab({ seguroId, isActive }: UsuariosPortalTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -32,9 +33,9 @@ export function UsuariosPortalTab({ seguroId }: UsuariosPortalTabProps) {
   const subcollectionPath = `seguros/${seguroId}/usuarios_portal`;
 
   const itemsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isActive) return null;
     return collection(firestore, subcollectionPath);
-  }, [firestore, subcollectionPath]);
+  }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<UsuarioPortal>(itemsQuery);
 
@@ -82,7 +83,7 @@ export function UsuariosPortalTab({ seguroId }: UsuariosPortalTabProps) {
       <CardContent>
          <GenericSubcollectionTable<UsuarioPortal>
             items={items}
-            isLoading={isLoading}
+            isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
             onDelete={canDelete ? 'firestore' : undefined}

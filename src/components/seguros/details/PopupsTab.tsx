@@ -10,12 +10,12 @@ import { PlusCircle } from 'lucide-react';
 import { GenericSubcollectionSheet } from './GenericSubcollectionSheet';
 import { GenericSubcollectionTable } from './GenericSubcollectionTable';
 import * as z from "zod";
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 interface PopupsTabProps {
   seguroId: string;
+  isActive: boolean;
 }
 
 const formSchema = z.object({
@@ -34,7 +34,7 @@ const formFields = [
   { name: 'activo' as const, label: 'Popup Activo', type: 'switch' as const },
 ];
 
-export function PopupsTab({ seguroId }: PopupsTabProps) {
+export function PopupsTab({ seguroId, isActive }: PopupsTabProps) {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -43,9 +43,9 @@ export function PopupsTab({ seguroId }: PopupsTabProps) {
   const subcollectionPath = `seguros/${seguroId}/popups`;
 
   const itemsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isActive) return null;
     return collection(firestore, subcollectionPath);
-  }, [firestore, subcollectionPath]);
+  }, [firestore, subcollectionPath, isActive]);
 
   const { data: items, isLoading } = useCollection<Popup>(itemsQuery);
 
@@ -97,7 +97,7 @@ export function PopupsTab({ seguroId }: PopupsTabProps) {
       <CardContent>
          <GenericSubcollectionTable<Popup>
             items={items}
-            isLoading={isLoading}
+            isLoading={isLoading && isActive}
             columns={tableColumns}
             onEdit={canEdit ? handleEdit : undefined}
             onDelete={canDelete ? 'firestore' : undefined}
