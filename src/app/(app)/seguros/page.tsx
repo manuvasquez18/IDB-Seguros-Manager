@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -37,7 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 import type { Seguro } from "@/lib/definitions";
 import { SeguroSheet } from "@/components/seguros/seguro-sheet";
@@ -48,6 +49,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 export default function SegurosPage() {
   const firestore = useFirestore();
   const { profile } = useUserProfile();
+  const { user } = useUser();
   const router = useRouter();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -56,9 +58,10 @@ export default function SegurosPage() {
   const [seguroToDelete, setSeguroToDelete] = useState<Seguro | null>(null);
 
   const segurosQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // Only run the query if the user is authenticated and firestore is available
+    if (!firestore || !user) return null;
     return collection(firestore, 'seguros');
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: seguros, isLoading } = useCollection<Seguro>(segurosQuery);
 
@@ -138,7 +141,7 @@ export default function SegurosPage() {
                   <TableHead className="hidden md:table-cell">Contacto</TableHead>
                   <TableHead className="hidden lg:table-cell">RIF</TableHead>
                   <TableHead>Estatus</TableHead>
-                  {(canEdit || canDelete) && (
+                  {(canEdit || canDelete || canViewDetails) && (
                     <TableHead>
                       <span className="sr-only">Acciones</span>
                     </TableHead>
@@ -157,7 +160,7 @@ export default function SegurosPage() {
                           {seguro.estatus}
                         </Badge>
                       </TableCell>
-                      {(canEdit || canDelete) && (
+                      {(canEdit || canDelete || canViewDetails) && (
                         <TableCell onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
