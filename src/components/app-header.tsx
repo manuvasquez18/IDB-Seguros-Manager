@@ -1,7 +1,9 @@
+
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -22,9 +24,12 @@ export default function AppHeader() {
   const { user } = useUser();
   const auth = useAuth();
   const { profile } = useUserProfile();
+  const router = useRouter();
 
   const handleLogout = () => {
-    auth.signOut();
+    auth.signOut().then(() => {
+      router.push('/login');
+    });
   };
 
   return (
@@ -45,17 +50,7 @@ export default function AppHeader() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            {user && user.photoURL ? (
-                <Image
-                  src={user.photoURL}
-                  width={36}
-                  height={36}
-                  alt="User avatar"
-                  className="rounded-full"
-                />
-            ) : (
-                <CircleUser className="h-5 w-5" />
-            )}
+            <CircleUser className="h-5 w-5" />
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>

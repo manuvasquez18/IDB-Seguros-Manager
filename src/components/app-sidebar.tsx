@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
   SidebarHeader,
@@ -31,9 +31,13 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
   const { profile } = useUserProfile();
+  const router = useRouter();
+
 
   const handleLogout = () => {
-    auth.signOut();
+    auth.signOut().then(() => {
+      router.push('/login');
+    });
   };
 
   const userCanView = (itemRoles: string[]) => {
