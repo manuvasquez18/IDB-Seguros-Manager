@@ -63,7 +63,7 @@ const SegurosTable = ({
         <TableRow>
           <TableHead>Nombre</TableHead>
           <TableHead className="hidden md:table-cell">Contacto</TableHead>
-          <TableHead className="hidden lg:table-cell">RIF</TableHead>
+          <TableHead>Tipo</TableHead>
           <TableHead>Estatus</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
@@ -74,7 +74,11 @@ const SegurosTable = ({
             <TableRow key={seguro.id}>
               <TableCell className="font-medium">{seguro.nombre}</TableCell>
               <TableCell className="hidden md:table-cell">{seguro.contacto}</TableCell>
-              <TableCell className="hidden lg:table-cell">{seguro.rif}</TableCell>
+              <TableCell>
+                <Badge variant={seguro.tipo_seguro === 'Seguro Nacional' ? 'secondary' : 'outline'}>
+                  {seguro.tipo_seguro.replace('Seguro ', '')}
+                </Badge>
+              </TableCell>
               <TableCell>
                  <Badge variant={seguro.estatus === 'Activo' ? 'default' : 'destructive'}>
                   {seguro.estatus}
@@ -90,7 +94,7 @@ const SegurosTable = ({
         ) : (
           <TableRow>
             <TableCell colSpan={5} className="text-center h-24">
-              No se encontraron seguros en esta categoría.
+              No se encontraron seguros.
             </TableCell>
           </TableRow>
         )}
@@ -126,8 +130,8 @@ export default function SegurosPage() {
   const canDelete = profile?.rol === 'admin';
   const canViewDetails = true;
 
-  const filteredAndGroupedSeguros = useMemo(() => {
-    if (!seguros) return { nacionales: [], internacionales: [] };
+  const filteredSeguros = useMemo(() => {
+    if (!seguros) return [];
     
     const filtered = seguros.filter(seguro => 
       seguro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -135,15 +139,7 @@ export default function SegurosPage() {
       (seguro.rif && seguro.rif.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const nacionales = filtered
-      .filter(s => s.tipo_seguro === 'Seguro Nacional')
-      .sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-    const internacionales = filtered
-      .filter(s => s.tipo_seguro === 'Seguro Internacional')
-      .sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-    return { nacionales, internacionales };
+    return filtered.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
   }, [seguros, searchTerm]);
 
@@ -212,16 +208,9 @@ export default function SegurosPage() {
                   )}
               </div>
             </CardHeader>
-        </Card>
-
-        {/* Seguros Nacionales */}
-        <Card>
-            <CardHeader>
-              <CardTitle>Seguros Nacionales</CardTitle>
-            </CardHeader>
-            <CardContent>
+             <CardContent>
               <SegurosTable 
-                seguros={filteredAndGroupedSeguros.nacionales}
+                seguros={filteredSeguros}
                 canViewDetails={canViewDetails}
                 canEdit={canEdit}
                 canDelete={canDelete}
@@ -230,24 +219,6 @@ export default function SegurosPage() {
                 onDelete={openDeleteDialog}
               />
             </CardContent>
-          </Card>
-
-        {/* Seguros Internacionales */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Seguros Internacionales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SegurosTable 
-              seguros={filteredAndGroupedSeguros.internacionales}
-              canViewDetails={canViewDetails}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              onViewDetails={handleViewDetails}
-              onEdit={handleEdit}
-              onDelete={openDeleteDialog}
-            />
-          </CardContent>
         </Card>
       </div>
       
