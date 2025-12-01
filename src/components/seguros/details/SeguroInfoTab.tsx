@@ -21,7 +21,7 @@ const DetailItem = ({ label, value }: { label: string; value?: string | null }) 
       return (
           <div className="grid grid-cols-3 gap-2 text-sm">
             <span className="font-semibold text-muted-foreground">{label}</span>
-            <span className="col-span-2">
+            <span className="col-span-2 break-all">
                 <Link href={value} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">
                     {value}
                 </Link>
@@ -33,7 +33,7 @@ const DetailItem = ({ label, value }: { label: string; value?: string | null }) 
   return (
     <div className="grid grid-cols-3 gap-2 text-sm">
       <span className="font-semibold text-muted-foreground">{label}</span>
-      <span className="col-span-2">{value}</span>
+      <span className="col-span-2 break-all">{value}</span>
     </div>
   );
 };
